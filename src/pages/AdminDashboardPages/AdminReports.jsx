@@ -60,7 +60,7 @@ const AdminReports = () => {
     const token = localStorage.getItem("token");
     try {
       setLoading(true);
-      const response = await axios.get("http://localhost:5002/laundry/api/users/allusers", {
+      const response = await axios.get("http://localhost:5002/laundry/api/users/allcustomers", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -151,7 +151,7 @@ const AdminReports = () => {
 
   const getCustomerSegment = (customer) => {
     const customerOrders = orders.filter(o => o.user_id === customer._id).length;
-    if (customerOrders > 2) return 'VIP';
+    if (customerOrders > 3) return 'VIP';
     if (customerOrders > 1) return 'Regular';
     return 'New';
   };
@@ -429,7 +429,7 @@ const AdminReports = () => {
             </div>
 
             <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-              <h2 className="text-lg font-semibold text-gray-800 mb-4">Recent Orders</h2>
+              <h2 className="text-lg font-semibold text-gray-800 mb-4">Orders</h2>
               <div className="overflow-x-auto">
                 <table className="min-w-full divide-y divide-gray-200">
                   <thead className="bg-gray-50">
@@ -648,7 +648,6 @@ const AdminReports = () => {
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Segment</th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Orders</th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Spent</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
@@ -695,16 +694,6 @@ const AdminReports = () => {
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                             {formatCurrency(totalSpent)}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                            <button className="text-blue-600 hover:text-blue-900 mr-3 flex items-center gap-1">
-                              <FiEye size={14} />
-                              <span>View</span>
-                            </button>
-                            <button className="text-gray-600 hover:text-gray-900 flex items-center gap-1">
-                              <FiMail size={14} />
-                              <span>Message</span>
-                            </button>
                           </td>
                         </tr>
                       );

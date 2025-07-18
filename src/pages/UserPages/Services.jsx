@@ -101,6 +101,7 @@ const Services = () => {
     <div className="min-h-screen bg-[#D6D6D6]">
       <BackToTop/>
       <section className="relative bg-gradient-to-b from-[#000980] to-[#0A6FC2] text-white h-[80vh] flex items-center px-4 text-center">
+        <img src="icnon_beaver_nil_bg.png" className="absolute h-[80vh] left-0 hidden lg:block" alt="" />
         <div className="max-w-4xl mx-auto z-10">
           <h1 className="text-4xl md:text-6xl font-bold mb-6 text-[#0ba5c6]" style={{ fontFamily: "'Bauhaus 93', sans-serif" }}>
             Our <span className="text-white">Services</span>

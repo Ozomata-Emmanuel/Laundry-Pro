@@ -109,8 +109,8 @@ const Footer = () => {
             &copy; {new Date().getFullYear()} Laundry. All rights reserved.
           </p>
           <div className="flex space-x-6">
-            <Link to="/privacy" className="text-gray-300 hover:text-[#0BA5C6] transition-colors">Privacy Policy</Link>
-            <Link to="/terms" className="text-gray-300 hover:text-[#0BA5C6] transition-colors">Terms of Service</Link>
+            <Link to="/privacy-policy" className="text-gray-300 hover:text-[#0BA5C6] transition-colors">Privacy Policy</Link>
+            <Link to="/terms-of-service" className="text-gray-300 hover:text-[#0BA5C6] transition-colors">Terms of Service</Link>
             <Link to="/faq" className="text-gray-300 hover:text-[#0BA5C6] transition-colors">FAQ</Link>
           </div>
         </div>

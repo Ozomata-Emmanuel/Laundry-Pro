@@ -6,15 +6,15 @@ const NotAuthorized = () => {
 
 
   return (
-    <div className="flex flex-col top-0 absolute z-50 w-full items-center justify-center h-screen bg-gray-100">
-      <h1 className="text-6xl z-50 font-bold text-red-600">403</h1>
-        <p className="mt-4 z-50 text-xl text-gray-700">You don't have permission to access this page</p>
-        <button
-          onClick={() => navigate(-1)}
-          className="mt-6 z-50 inline-block px-6 py-2 text-white bg-indigo-600 rounded hover:bg-indigo-700 transition"
-        >
-          Go Back
-        </button>
+    <div className="flex flex-col top-0 absolute z-50 pb-30 w-full items-center justify-center h-screen bg-[#f8f5f2]">
+      <img src="/403_unauthorized_beaver.png" className='w-100' alt="" />
+      <p className="mt-4 z-50 text-3xl text-gray-700 animate-bounce">You don't have permission to access this page</p>
+      <button
+        onClick={() => navigate(-1)}
+        className="mt-6 z-50 font-semibold text-4xl uppercase inline-block px-6 py-2 text-[#f1f4f5] bg-[#5ca9db] hover:bg-[#3f89c2] rounded-3xl cursor-pointer transition"
+      >
+        Go Back
+      </button>
     </div>
   );
 }

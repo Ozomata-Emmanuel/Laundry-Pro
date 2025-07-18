@@ -185,7 +185,7 @@ const EmployeeDashboardOverview = () => {
                       {order.items.reduce((acc, item) => acc + item.quantity, 0)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      ${order.total_price.toFixed(2)}
+                      ₦{order.total_price.toFixed(2)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`px-3 py-1 rounded-full text-xs font-medium ${

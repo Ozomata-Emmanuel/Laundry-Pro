@@ -139,7 +139,7 @@ const About = () => {
       bg: "bg-gradient-to-tr from-[#0241bd] to-[#0f014d]",
       content: (
         <>
-          <p className="mb-4 bg-[#0241bd]">
+          <p className="mb-4 ">
             Our service model is designed around convenience, transparency, and exceptional support. We've reimagined every touchpoint to create a seamless laundry experience:
           </p>
           <div className="grid md:grid-cols-2 gap-6 mb-4">

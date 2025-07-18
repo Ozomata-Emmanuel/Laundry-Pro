@@ -47,6 +47,8 @@ import VerifyEmail from './components/verifyEmail';
 import NotFound from './components/NotFound';
 import ProtectedRoute from './components/ProtectedRoute';
 import NotAuthorized from './components/Notauthorized';
+import PrivacyPolicy from './components/PrivacyPolicy';
+import TermsOfService from './components/TermsOfService';
 
 function App() {
   const location = useLocation();
@@ -74,6 +76,8 @@ function App() {
         <Route path="/user-dashboard" element={<UserDashboard />} />
         <Route path="/not-authorized" element={<NotAuthorized />} />
         <Route path="/order" element={ <Order />} />
+        <Route path="/terms-of-service" element={<TermsOfService />} />
+        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
 
         <Route element={<ProtectedRoute allowedRoles={['supplier', 'admin']} />}>
           <Route path="/supplier-dashboard" element={<SupplierDashboardPage />}>

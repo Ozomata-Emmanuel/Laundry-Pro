@@ -95,7 +95,7 @@ const ManagerDashboardHeader = () => {
             <div className="ml-8 hidden md:block">
               <span className="text-sm text-gray-500">Branch:</span>
               <span className="ml-2 font-medium text-gray-700">
-                {branch.branch_name || 'N/A'}
+                {branch.branch_name || 'N/A'} | Manager
               </span>
             </div>
           )}

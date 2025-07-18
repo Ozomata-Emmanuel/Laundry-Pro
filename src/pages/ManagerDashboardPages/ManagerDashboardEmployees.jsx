@@ -162,9 +162,10 @@ const ManagerDashboardEmployees = () => {
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Employee</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contact</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Joined</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Active Orders</th>
+                {/* <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Active Orders</th> */}
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
               </tr>
             </thead>
@@ -179,9 +180,11 @@ const ManagerDashboardEmployees = () => {
                         </div>
                         <div>
                           <p className="font-medium">{employee.first_name} {employee.last_name}</p>
-                          <p className="text-sm text-gray-500">{employee.email}</p>
                         </div>
                       </div>
+                    </td>
+                    <td className='px-6 py-4 whitespace-nowrap'>
+                      <p className="text-sm text-gray-500">{employee.email}</p>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       {employee.phone || 'N/A'}
@@ -189,11 +192,11 @@ const ManagerDashboardEmployees = () => {
                     <td className="px-6 py-4 whitespace-nowrap">
                       {formatDate(employee.createdAt)}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    {/* <td className="px-6 py-4 whitespace-nowrap">
                       <span className="font-medium">
                         {employee.assignedOrders?.length || 0}
                       </span>
-                    </td>
+                    </td> */}
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex space-x-2">
                         <button 

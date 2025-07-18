@@ -60,6 +60,7 @@ const testimonials = [
     <div className="min-h-screen bg-[#f8f9ff]">
       <BackToTop />
       <section className="relative bg-gradient-to-b from-[#000980] to-[#0A6FC2] text-white h-screen pt-32 px-4 text-center overflow-hidden">
+        <img src="icnon_beaver_nil_bg.png" className="absolute h-[80vh] left-20 hidden lg:block" alt="" />
         <div className="">
           <div className="lg:w-60 lg:h-60 w-50 h-50  bg-[#0BA5C6] absolute top-0 right-0 rounded-bl-full"></div>
           <div className="lg:w-55 lg:h-55 w-45 h-45  bg-[#0A6FC2] absolute top-0 right-0 rounded-bl-full"></div>

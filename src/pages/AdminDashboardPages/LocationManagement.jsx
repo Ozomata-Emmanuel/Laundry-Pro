@@ -115,7 +115,7 @@ const LocationManagement = () => {
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">#Brach_{branch._id.slice(-4).toUpperCase()}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 font-medium">{branch.branch_name}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {branch.city}, {branch.state}
+                          {branch.city}, {branch.state.slice(0,6)}...
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{branch.phone}</td>
                         <td className="px-6 py-4 whitespace-nowrap">
