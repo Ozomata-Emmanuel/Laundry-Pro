@@ -50,8 +50,8 @@ const ManagerDashboardSideBar = () => {
   ];
 
   const handleLogout = () => {
-    localStorage.removeItem("laundry_user_id");
-    localStorage.removeItem("token");
+    localStorage.removeItem("laundry_manager_id");
+    localStorage.removeItem("ManagerToken");
     toast.success("Signed out successfully", {
       position: "top-right",
       autoClose: 2000,

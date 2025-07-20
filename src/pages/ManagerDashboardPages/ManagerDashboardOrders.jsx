@@ -39,7 +39,7 @@ const ManagerDashboardOrders = () => {
   const [assignLoading, setAssignLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
-  const [markingPaid, setMarkingPaid] = useState(false)
+  const [markingPaid, setMarkingPaid] = useState(false);
 
   useEffect(() => {
     if (user?.branch) {
@@ -49,14 +49,14 @@ const ManagerDashboardOrders = () => {
   }, [user]);
 
   const fetchOrders = async (branchId) => {
-    const token = localStorage.getItem("token");
+    const ManagerToken = localStorage.getItem("ManagerToken");
     try {
       setLoading(true);
       const res = await axios.get(
         `http://localhost:5002/laundry/api/order/all/${branchId}`,
         {
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${ManagerToken}`,
           },
         }
       );
@@ -65,7 +65,7 @@ const ManagerDashboardOrders = () => {
         `http://localhost:5002/laundry/api/users/branch/${branchId}/employees`,
         {
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${ManagerToken}`,
           },
         }
       );
@@ -93,13 +93,13 @@ const ManagerDashboardOrders = () => {
   };
 
   const fetchEmployees = async (branchId) => {
-    const token = localStorage.getItem("token");
+    const ManagerToken = localStorage.getItem("ManagerToken");
     try {
       const res = await axios.get(
         `http://localhost:5002/laundry/api/users/branch/${branchId}/employees`,
         {
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${ManagerToken}`,
           },
         }
       );
@@ -114,7 +114,7 @@ const ManagerDashboardOrders = () => {
   };
 
   const markAsPaid = async (orderId) => {
-    const token = localStorage.getItem("token");
+    const ManagerToken = localStorage.getItem("ManagerToken");
     setMarkingPaid(true);
     try {
       const res = await axios.put(
@@ -122,7 +122,7 @@ const ManagerDashboardOrders = () => {
         {},
         {
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${ManagerToken}`,
             "Content-Type": "application/json",
           },
         }
@@ -130,9 +130,11 @@ const ManagerDashboardOrders = () => {
 
       if (res.data.success) {
         toast.success("Payment marked as paid successfully!");
-        setOrders(orders.map(order => 
-          order._id === orderId ? { ...order, is_paid: true } : order
-        ));
+        setOrders(
+          orders.map((order) =>
+            order._id === orderId ? { ...order, is_paid: true } : order
+          )
+        );
         if (selectedOrder?._id === orderId) {
           setSelectedOrder({ ...selectedOrder, is_paid: true });
         }
@@ -151,7 +153,7 @@ const ManagerDashboardOrders = () => {
   };
 
   const handleAssignEmployee = async (orderId, employeeId) => {
-    const token = localStorage.getItem("token");
+    const ManagerToken = localStorage.getItem("ManagerToken");
     try {
       setAssignLoading(true);
       await axios.patch(
@@ -162,7 +164,7 @@ const ManagerDashboardOrders = () => {
         },
         {
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${ManagerToken}`,
           },
         }
       );
@@ -609,7 +611,11 @@ const ManagerDashboardOrders = () => {
                     <div>
                       <p className="text-sm text-gray-500">Amount</p>
                       <p className="font-medium">
-                        ${selectedOrder.total_price.toFixed(2)}
+                        ₦
+                        {selectedOrder.total_price.toLocaleString("en-US", {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })}
                       </p>
                     </div>
                     <div>
@@ -671,10 +677,21 @@ const ManagerDashboardOrders = () => {
                             {item.quantity}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
-                            ${item.price.toFixed(2)}
+                            ₦
+                            {item.price.toLocaleString("en-US", {
+                              minimumFractionDigits: 2,
+                              maximumFractionDigits: 2,
+                            })}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap font-medium">
-                            ${(item.price * item.quantity).toFixed(2)}
+                            ₦
+                            {(item.price * item.quantity).toLocaleString(
+                              "en-US",
+                              {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2,
+                              }
+                            )}
                           </td>
                         </tr>
                       ))}
@@ -688,7 +705,11 @@ const ManagerDashboardOrders = () => {
                           Subtotal
                         </td>
                         <td className="px-6 py-4 font-medium">
-                          ${selectedOrder.total_price.toFixed(2)}
+                          ₦
+                          {selectedOrder.total_price.toLocaleString("en-US", {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          })}
                         </td>
                       </tr>
                       <tr>
@@ -698,7 +719,7 @@ const ManagerDashboardOrders = () => {
                         >
                           Tax
                         </td>
-                        <td className="px-6 py-4 font-medium">$0.00</td>
+                        <td className="px-6 py-4 font-medium">₦0.00</td>
                       </tr>
                       <tr>
                         <td
@@ -708,7 +729,11 @@ const ManagerDashboardOrders = () => {
                           Total
                         </td>
                         <td className="px-6 py-4 font-bold">
-                          ${selectedOrder.total_price.toFixed(2)}
+                          ₦
+                          {selectedOrder.total_price.toLocaleString("en-US", {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          })}
                         </td>
                       </tr>
                     </tfoot>
@@ -750,8 +775,7 @@ const ManagerDashboardOrders = () => {
                     </div>
                   </div>
                 )}
-
-                {selectedOrder.special_requests && (
+                {selectedOrder.special_requests ? (
                   <div className="bg-white border border-gray-200 rounded-lg p-5 shadow-sm">
                     <div className="flex items-center mb-4">
                       <div className="bg-yellow-100 p-3 rounded-full mr-3">
@@ -764,6 +788,22 @@ const ManagerDashboardOrders = () => {
                     <div className="bg-gray-50 p-4 rounded border border-gray-200">
                       <p className="whitespace-pre-line text-gray-700">
                         {selectedOrder.special_requests}
+                      </p>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="bg-white border border-gray-200 rounded-lg p-5 shadow-sm">
+                    <div className="flex items-center mb-4">
+                      <div className="bg-yellow-100 p-3 rounded-full mr-3">
+                        <FaInfoCircle className="text-yellow-600 text-lg" />
+                      </div>
+                      <h3 className="font-semibold text-lg text-gray-700">
+                        Special Requests
+                      </h3>
+                    </div>
+                    <div className="bg-gray-50 p-4 rounded border border-gray-200">
+                      <p className="whitespace-pre-line text-gray-700">
+                        No special requests
                       </p>
                     </div>
                   </div>
@@ -829,7 +869,7 @@ const ManagerDashboardOrders = () => {
                         : "bg-green-600 hover:bg-green-700"
                     } text-white rounded-lg transition-colors flex items-center justify-center`}
                   >
-                    {markingPaid? (
+                    {markingPaid ? (
                       <>
                         <FaSpinner className="animate-spin mr-2" />
                         Processing...

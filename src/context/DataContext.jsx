@@ -5,7 +5,11 @@ import { createContext, useState } from "react";
 export const DataContext = createContext();
 
 function DataProvider({children}) {
-  const localstorageData = localStorage.getItem("laundry_user_id");
+  const localstorageCustomerData = localStorage.getItem("laundry_customer_id");
+  const localstorageAdminData = localStorage.getItem("laundry_admin_id");
+  const localstorageManagerData = localStorage.getItem("laundry_manager_id");
+  const localstorageEmployeeData = localStorage.getItem("laundry_employee_id");
+  const localstorageSupplierData = localStorage.getItem("laundry_supplier_id");
   const [user, setUser] = useState({});
   const [load, setLoad] = useState(false);
 
@@ -22,8 +26,16 @@ function DataProvider({children}) {
 
   
   useEffect(() => {
-    if (localstorageData) {
-      getUser(localstorageData);
+    if (localstorageCustomerData) {
+      getUser(localstorageCustomerData);
+    } else if (localstorageAdminData) {
+      getUser(localstorageAdminData);
+    } else if (localstorageManagerData) {
+      getUser(localstorageManagerData);
+    } else if (localstorageEmployeeData) {
+      getUser(localstorageEmployeeData);
+    } else if (localstorageSupplierData) {
+      getUser(localstorageSupplierData);
     } else {
       setUser({})  
     };

@@ -37,7 +37,7 @@ const AdminRegisterSupplier = () => {
     }
 
     setLoading(true);
-    const token = localStorage.getItem("token");
+    const AdminToken = localStorage.getItem("AdminToken");
     try {
       const response = await axios.post(
         'http://localhost:5002/laundry/api/suppliers/register',
@@ -45,7 +45,7 @@ const AdminRegisterSupplier = () => {
         {
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${AdminToken}`,
           }
         }
       );

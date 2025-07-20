@@ -35,12 +35,12 @@ const AdminRegisterEmployee = () => {
   }, []);
 
   const fetchBranches = async () => {
-    const token = localStorage.getItem("token");
+    const AdminToken = localStorage.getItem("AdminToken");
     try {
       setLoading(true);
       const response = await axios.get("http://localhost:5002/laundry/api/branch/all", {
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${AdminToken}`,
         },
       });
       const branchOptions = response.data.data.map((branch) => ({
@@ -58,7 +58,7 @@ const AdminRegisterEmployee = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    const token = localStorage.getItem("token");
+    const AdminToken = localStorage.getItem("AdminToken");
       
     if (formData.password !== formData.confirmPassword) {
       toast.error("Passwords do not match");
@@ -88,7 +88,7 @@ const AdminRegisterEmployee = () => {
         employee,
         {
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${AdminToken}`,
             'Content-Type': 'application/json',
           }
         }

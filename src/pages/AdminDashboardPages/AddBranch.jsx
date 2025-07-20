@@ -21,12 +21,12 @@ const AddBranch = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const token = localStorage.getItem("token");
+    const AdminToken = localStorage.getItem("AdminToken");
     try {
       setLoading(true);
       await axios.post('http://localhost:5002/laundry/api/branch/create', formData,{
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${AdminToken}`,
         },
       });
       toast.success('Branch added successfully');

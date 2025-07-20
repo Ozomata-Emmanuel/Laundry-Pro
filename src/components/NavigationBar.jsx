@@ -7,7 +7,7 @@ import { toast } from 'react-toastify';
 
 const NavigationBar = () => {
   const { user } = useContext(DataContext);
-  const [isLoggedIn, setIsLoggedIn] = useState(() => !!localStorage.getItem('laundry_user_id'));
+  const [isLoggedIn, setIsLoggedIn] = useState(() => !!localStorage.getItem('laundry_customer_id'));
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate()
 
@@ -16,8 +16,8 @@ const NavigationBar = () => {
   };
 
   function handleLogout(){
-    localStorage.removeItem("laundry_user_id")
-    localStorage.removeItem("token")
+    localStorage.removeItem("laundry_customer_id")
+    localStorage.removeItem("CustomerToken")
     toast.success("logged out successfully", {
       position: "top-right",
       autoClose: 2000,

@@ -3,7 +3,6 @@ import getUserFromToken from '../utils/auth';
 
 const ProtectedRoute = ({ allowedRoles }) => {
   const user = getUserFromToken();
-
   if (!user) return <Navigate to="/auth" replace />;
 
   if (!allowedRoles.includes(user.role)) {

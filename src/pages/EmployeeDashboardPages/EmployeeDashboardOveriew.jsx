@@ -25,12 +25,12 @@ const EmployeeDashboardOverview = () => {
   }, [user]);
 
   const fetchEmployeeOrders = async (employeeId) => {
-    const token = localStorage.getItem("token");
+    const EmployeeToken = localStorage.getItem("EmployeeToken");
     try {
       setLoading(true);
       const res = await axios.get(`http://localhost:5002/laundry/api/orders/employee/${employeeId}`, {
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${EmployeeToken}`,
         },
       });
       setOrders(res.data.data);

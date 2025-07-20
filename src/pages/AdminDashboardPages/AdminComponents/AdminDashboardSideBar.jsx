@@ -29,14 +29,15 @@ const AdminDashboardSideBar = () => {
     { path: "/admin-dashboard/register-supplier", name: "Add Supplier", icon: <FiUserPlus className="h-5 w-5" /> },
     { path: "/admin-dashboard/manage-locations", name: "Branches", icon: <FaCodeBranch className="h-5 w-5" /> },
     { path: "/admin-dashboard/reports", name: "Reports", icon: <FiTrendingUp className="h-5 w-5" /> },
+    { path: "/admin-dashboard/employee-requests", name: "Employee Requests", icon: <FiTrendingUp className="h-5 w-5" /> },
     
     // { path: "/admin-dashboard/settings", name: "Settings", icon: <FiSettings className="h-5 w-5" /> },
   ];
 
 
   const handleLogout = () => {
-    localStorage.removeItem("laundry_user_id");
-    localStorage.removeItem("token");
+    localStorage.removeItem("laundry_admin_id");
+    localStorage.removeItem("AdminToken");
     toast.success("Signed out successfully", {
       position: "top-right",
       autoClose: 2000,

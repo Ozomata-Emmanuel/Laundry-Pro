@@ -170,9 +170,9 @@ const PrintableReceipt = React.forwardRef(({ order, user, branch }, ref) => (
               <tr key={index}>
                 <td className="text-dark">{item.name}</td>
                 <td className="text-muted text-right">{item.quantity}</td>
-                <td className="text-muted text-right">${item.price.toFixed(2)}</td>
+                <td className="text-muted text-right">₦{item.price.toFixed(2)}</td>
                 <td className="text-dark text-right font-semibold">
-                  ${(item.price * item.quantity).toFixed(2)}
+                  ₦{(item.price * item.quantity).toFixed(2)}
                 </td>
               </tr>
             ))}
@@ -183,12 +183,12 @@ const PrintableReceipt = React.forwardRef(({ order, user, branch }, ref) => (
       <div className="text-right mb-6">
         <div className="flex justify-between py-2 px-3">
           <span className="text-muted">Subtotal:</span>
-          <span className="text-dark">${order.total_price.toFixed(2)}</span>
+          <span className="text-dark">₦{order.total_price.toFixed(2)}</span>
         </div>
         <div className="flex justify-between py-2 px-3 bg-lightblue rounded-sm">
           <span className="text-dark font-semibold">Total:</span>
           <span className="text-primary font-semibold">
-            ${order.total_price.toFixed(2)}
+            ₦{order.total_price.toFixed(2)}
           </span>
         </div>
       </div>

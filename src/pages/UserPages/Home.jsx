@@ -6,38 +6,38 @@ import BackToTop from "../../components/BackToTop";
 const Home = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
 
-const testimonials = [
-  {
-    id: 1,
-    quote:
-      "My clothes have never looked better! The folding service is not only precise but makes everything feel like it’s fresh from a boutique. Highly recommend!",
-    author: "Sarah J.",
-  },
-  {
-    id: 2,
-    quote:
-      "The same-day service truly saved me when I was in a pinch before a big meeting. Fast, reliable, and my clothes looked absolutely spotless.",
-    author: "Michael T.",
-  },
-  {
-    id: 3,
-    quote:
-      "The team is incredibly professional, and I’m always impressed by how fresh and clean my clothes come back. They treat every piece with care.",
-    author: "Priya K.",
-  },
-  {
-    id: 4,
-    quote:
-      "I've been using their service for several months now, and the quality has been consistently excellent. It's dependable and makes my week so much easier.",
-    author: "David L.",
-  },
-  {
-    id: 5,
-    quote:
-      "Their attention to detail, especially with delicate and specialty fabrics, is truly impressive. I trust them completely with my wardrobe.",
-    author: "Emma R.",
-  },
-];
+  const testimonials = [
+    {
+      id: 1,
+      quote:
+        "My clothes have never looked better! The folding service is not only precise but makes everything feel like it’s fresh from a boutique. Highly recommend!",
+      author: "Sarah J.",
+    },
+    {
+      id: 2,
+      quote:
+        "The same-day service truly saved me when I was in a pinch before a big meeting. Fast, reliable, and my clothes looked absolutely spotless.",
+      author: "Michael T.",
+    },
+    {
+      id: 3,
+      quote:
+        "The team is incredibly professional, and I’m always impressed by how fresh and clean my clothes come back. They treat every piece with care.",
+      author: "Priya K.",
+    },
+    {
+      id: 4,
+      quote:
+        "I've been using their service for several months now, and the quality has been consistently excellent. It's dependable and makes my week so much easier.",
+      author: "David L.",
+    },
+    {
+      id: 5,
+      quote:
+        "Their attention to detail, especially with delicate and specialty fabrics, is truly impressive. I trust them completely with my wardrobe.",
+      author: "Emma R.",
+    },
+  ];
 
 
   const goToNext = () => {
@@ -59,7 +59,7 @@ const testimonials = [
   return (
     <div className="min-h-screen bg-[#f8f9ff]">
       <BackToTop />
-      <section className="relative bg-gradient-to-b from-[#000980] to-[#0A6FC2] text-white h-screen pt-32 px-4 text-center overflow-hidden">
+      <section className="relative bg-gradient-to-b from-[#2d3d9a] to-[#0A6FC2] text-white h-screen pt-32 px-4 text-center overflow-hidden">
         <img src="icnon_beaver_nil_bg.png" className="absolute h-[80vh] left-20 hidden lg:block" alt="" />
         <div className="">
           <div className="lg:w-60 lg:h-60 w-50 h-50  bg-[#0BA5C6] absolute top-0 right-0 rounded-bl-full"></div>

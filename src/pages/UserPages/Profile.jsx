@@ -373,10 +373,10 @@ const Profile = () => {
                               {item.quantity}
                             </td>
                             <td className="py-3 px-4 text-right text-gray-600">
-                              ${item.price.toFixed(2)}
+                              ₦{item.price.toFixed(2)}
                             </td>
                             <td className="py-3 px-4 text-right text-gray-800 font-medium">
-                              ${(item.price * item.quantity).toFixed(2)}
+                              ₦{(item.price * item.quantity).toFixed(2)}
                             </td>
                           </tr>
                         ))}
@@ -390,7 +390,7 @@ const Profile = () => {
                     <div className="flex justify-between w-64">
                       <span className="text-gray-600">Subtotal:</span>
                       <span className="font-medium">
-                        ${selectedOrder.total_price.toFixed(2)}
+                        ₦{selectedOrder.total_price.toFixed(2)}
                       </span>
                     </div>
                     <div className="flex justify-between w-64 border-t-2 border-gray-300 pt-3">
@@ -398,7 +398,7 @@ const Profile = () => {
                         Total:
                       </span>
                       <span className="text-lg font-bold text-indigo-800">
-                        ${selectedOrder.total_price.toFixed(2)}
+                        ₦{selectedOrder.total_price.toFixed(2)}
                       </span>
                     </div>
                   </div>
@@ -684,7 +684,7 @@ const Profile = () => {
                                 </span>
                               </td>
                               <td className="px-6 py-4 whitespace-nowrap text-sm text-indigo-800 text-right font-medium">
-                                ${order.total_price.toFixed(2)}
+                                ₦{order.total_price.toFixed(2)}
                               </td>
                               <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                 <button

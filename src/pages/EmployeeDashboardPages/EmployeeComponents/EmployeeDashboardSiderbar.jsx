@@ -6,6 +6,8 @@ import {
   FiLogOut,
   FiClipboard
 } from "react-icons/fi";
+import { MdOutlineInventory2 } from "react-icons/md";
+
 import { PiSuitcaseSimple } from "react-icons/pi";
 <PiSuitcaseSimple />
 import { toast } from "react-toastify";
@@ -18,12 +20,13 @@ const EmployeeDashboardSiderbar = () => {
     { path: "/employee-dashboard/overview", name: "Overview", icon: <FiHome className="h-5 w-5" /> },
     { path: "/employee-dashboard/assigned-orders", name: "Orders", icon: <FiClipboard className="h-5 w-5" /> },
     { path: "/employee-dashboard/leave", name: "Leave request", icon: <PiSuitcaseSimple className="h-5 w-5" /> },
+    { path: "/employee-dashboard/inventory", name: "Inventory request", icon: <MdOutlineInventory2  className="h-5 w-5" /> },
   ];
 
 
   const handleLogout = () => {
     localStorage.removeItem("laundry_user_id");
-    localStorage.removeItem("token");
+    localStorage.removeItem("EmployeeToken");
     toast.success("Signed out successfully", {
       position: "top-right",
       autoClose: 2000,

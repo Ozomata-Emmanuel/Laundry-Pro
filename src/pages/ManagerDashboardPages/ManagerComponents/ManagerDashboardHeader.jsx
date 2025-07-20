@@ -7,20 +7,21 @@ const ManagerDashboardHeader = () => {
   const { user } = useContext(DataContext);
   const [branch, setBranch] = useState({});
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('')
   const [showDropdown, setShowDropdown] = useState(false);
   const [orders, setOrders] = useState([]);
   const hasUnassignedOrders = orders.some(order => !order.assigned_employee_id);
 
 
   const fetchOrders = async (branchId) => {
-    const token = localStorage.getItem("token");
+    const ManagerToken = localStorage.getItem("ManagerToken");
     try {
       setLoading(true);
       const res = await axios.get(
         `http://localhost:5002/laundry/api/order/all/${branchId}`,
         {
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${ManagerToken}`,
           },
         }
       );
@@ -29,7 +30,7 @@ const ManagerDashboardHeader = () => {
         `http://localhost:5002/laundry/api/users/branch/${branchId}/employees`,
         {
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${ManagerToken}`,
           },
         }
       );
@@ -56,13 +57,13 @@ const ManagerDashboardHeader = () => {
   };
 
   const fetchBranch = async (branchId) => {
-    const token = localStorage.getItem("token");
+    const ManagerToken = localStorage.getItem("ManagerToken");
     try {
       setLoading(true);
       const res = await axios.get(`http://localhost:5002/laundry/api/branch/${branchId}`,
         {
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${ManagerToken}`,
           },
         }
       );

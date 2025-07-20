@@ -1,0 +1,12 @@
+import React from 'react'
+
+const EmployeeDashboardInventory = () => {
+  return (
+    <>
+    <div className="mt-10"></div>
+      Lorem ipsum dolor, sit amet consectetur adipisicing elit. Odit consequatur commodi odio. Ipsam explicabo cupiditate illum, nam necessitatibus corporis porro architecto. Autem dolorem ut consequuntur iure voluptate molestiae assumenda, exercitationem sit, earum recusandae nam ipsam incidunt vel. Atque voluptatem quaerat perferendis quia nobis tempora nemo obcaecati aliquid laborum! Illo mollitia veniam culpa. A quisquam perspiciatis velit distinctio ullam atque quibusdam quaerat illum saepe. Quidem quas reiciendis dolores iure, praesentium accusamus eos dolorum, enim quod libero modi culpa? Iste, excepturi inventore necessitatibus incidunt doloremque corporis sit omnis cum iure minus ducimus esse! Aliquid, impedit praesentium magni quis, nostrum sunt porro nesciunt accusantium ipsam cumque vitae, sapiente doloribus distinctio hic asperiores dolore labore temporibus? Ullam veniam neque libero, in laboriosam sint dolore nesciunt distinctio nisi ipsam recusandae incidunt nulla. Quis, cum blanditiis atque ab magnam voluptate quod ducimus laborum porro rem voluptatibus molestiae illum iusto totam hic eos nesciunt, dolorum quos ex. Consequuntur molestiae alias fuga impedit, minus quia minima dolore, ipsum totam accusamus possimus quibusdam, iure neque explicabo. Porro eligendi dolor in itaque! Ex nesciunt fugiat eligendi nemo esse possimus non illum temporibus est. Voluptate libero in quidem neque sequi natus provident velit nostrum nisi non eaque ad corporis veniam expedita dolor, sint esse amet impedit placeat fugit debitis. Esse magnam est ipsam explicabo? Voluptate qui officiis necessitatibus repudiandae, sed explicabo quidem voluptatem cumque assumenda molestias esse debitis maiores a aliquam odit quod dolores cum iusto quis optio similique. Unde voluptates error alias mollitia minima officiis, provident ullam optio quam aliquid ratione non veritatis consequatur. Repellendus neque itaque magni consequuntur, fugiat deserunt quisquam perspiciatis temporibus vel quia magnam laudantium non, inventore voluptates impedit, asperiores aliquam cum quam ab quo harum et incidunt. Tempore cupiditate at ad saepe ipsam, voluptas architecto soluta totam perspiciatis minus sapiente ratione assumenda facilis aliquam repellat exercitationem?
+    </>
+  )
+}
+
+export default EmployeeDashboardInventory

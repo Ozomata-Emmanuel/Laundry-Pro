@@ -11,10 +11,10 @@ const AdminManageEmployees = () => {
   const fetchEmployees = async () => {
     try {
       setLoading(true);
-      const token = localStorage.getItem("token");
+      const AdminToken = localStorage.getItem("AdminToken");
       const response = await axios.get('http://localhost:5002/laundry/api/users/all', {
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${AdminToken}`,
         },
       });
       

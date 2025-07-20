@@ -49,6 +49,9 @@ import ProtectedRoute from './components/ProtectedRoute';
 import NotAuthorized from './components/Notauthorized';
 import PrivacyPolicy from './components/PrivacyPolicy';
 import TermsOfService from './components/TermsOfService';
+import EmployeeDashboardInventory from './pages/EmployeeDashboardPages/EmployeeDashboardInventory';
+import AdminFulfillmentDashboard from './pages/AdminDashboardPages/AdminFulfillmentDashboard';
+import EmployeeRequestForm from './pages/EmployeeDashboardPages/EmployeeRequestForm';
 
 function App() {
   const location = useLocation();
@@ -104,6 +107,7 @@ function App() {
             <Route path="manage-locations" element={<LocationManagement />} />
             <Route path="add-branch" element={<AddBranch />} />
             <Route path="reports" element={<AdminReports />} />
+            <Route path="employee-requests" element={<AdminFulfillmentDashboard />} />
           </Route>
         </Route>
 
@@ -124,6 +128,7 @@ function App() {
             <Route path="overview" element={<EmployeeDashboardOveriew />} />
             <Route path="leave" element={<EmployeeDashboardLeave />} />
             <Route path="assigned-orders" element={<EmployeeDashboardOrder />} />
+            <Route path="inventory" element={<EmployeeRequestForm />} />
           </Route>
         </Route>
 

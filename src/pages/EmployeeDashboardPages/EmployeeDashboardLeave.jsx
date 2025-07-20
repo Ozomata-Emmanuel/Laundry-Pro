@@ -41,14 +41,14 @@ const EmployeeDashboardLeave = () => {
 
   const fetchEmployeeLeaves = async () => {
     if (!employeeId) return;
-    const token = localStorage.getItem("token");
+    const EmployeeToken = localStorage.getItem("EmployeeToken");
     try {
       setLoading(true);
       const res = await axios.get(
         `http://localhost:5002/laundry/api/leave/all/${employeeId}`,
         {
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${EmployeeToken}`,
           },
         }
       );
@@ -62,7 +62,7 @@ const EmployeeDashboardLeave = () => {
 
   const handleSubmitLeave = async (e) => {
     e.preventDefault();
-    const token = localStorage.getItem("token");
+    const EmployeeToken = localStorage.getItem("EmployeeToken");
     try {
       setLoading(true);
       const response = await axios.post(
@@ -73,7 +73,7 @@ const EmployeeDashboardLeave = () => {
         },
         {
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${EmployeeToken}`,
           },
         }
       );
@@ -93,14 +93,14 @@ const EmployeeDashboardLeave = () => {
   };
 
   const handleDeleteLeave = async () => {
-    const token = localStorage.getItem("token");
+    const EmployeeToken = localStorage.getItem("EmployeeToken");
     try {
       setLoading(true);
       await axios.delete(
         `http://localhost:5002/laundry/api/leave/${selectedLeave._id}`,
         {
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${EmployeeToken}`,
           },
         }
       );
