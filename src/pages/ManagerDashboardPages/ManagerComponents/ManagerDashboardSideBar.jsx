@@ -34,6 +34,11 @@ const ManagerDashboardSideBar = () => {
       name: "Employees",
       icon: <FiUsers className="h-5 w-5" />,
     },
+    {
+      path: "/manager-dashboard/manage-requests",
+      name: "Employees Requests",
+      icon: <FiUsers className="h-5 w-5" />,
+    },
     // {
     // path: "/manager-dashboard/inventory",
     // name: "Inventory",

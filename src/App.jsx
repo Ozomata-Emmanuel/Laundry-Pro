@@ -38,10 +38,12 @@ import ManagerDashboardEmployees from './pages/ManagerDashboardPages/ManagerDash
 import ManagerDashboardReports from './pages/ManagerDashboardPages/ManagerDashboardReports';
 import ManagerDashboardOrders from './pages/ManagerDashboardPages/ManagerDashboardOrders';
 import ManagerDashboardInventory from './pages/ManagerDashboardPages/ManagerDashboardInventory';
+import ManagerDashboardApproveRequest from './pages/ManagerDashboardPages/ManagerDashboardApproveRequest';
 import EmployeeDashboardPages from './pages/EmployeeDashboardPages/EmployeeDashboardPages';
 import EmployeeDashboardOveriew from './pages/EmployeeDashboardPages/EmployeeDashboardOveriew';
 import EmployeeDashboardLeave from './pages/EmployeeDashboardPages/EmployeeDashboardLeave';
 import EmployeeDashboardOrder from './pages/EmployeeDashboardPages/EmployeeDashboardOrder';
+import EmployeeDashboardInventory from './pages/EmployeeDashboardPages/EmployeeDashboardInventory';
 import AdminOrderManagement from './pages/AdminDashboardPages/AdminOrderManagement';
 import VerifyEmail from './components/verifyEmail';
 import NotFound from './components/NotFound';
@@ -49,9 +51,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import NotAuthorized from './components/Notauthorized';
 import PrivacyPolicy from './components/PrivacyPolicy';
 import TermsOfService from './components/TermsOfService';
-import EmployeeDashboardInventory from './pages/EmployeeDashboardPages/EmployeeDashboardInventory';
 import AdminFulfillmentDashboard from './pages/AdminDashboardPages/AdminFulfillmentDashboard';
-import EmployeeRequestForm from './pages/EmployeeDashboardPages/EmployeeRequestForm';
 
 function App() {
   const location = useLocation();
@@ -119,6 +119,7 @@ function App() {
             <Route path="manage-employees" element={<ManagerDashboardEmployees />} />
             <Route path="orders" element={<ManagerDashboardOrders />} />
             <Route path="reports" element={<ManagerDashboardReports />} />
+            <Route path="manage-requests" element={<ManagerDashboardApproveRequest />} />
           </Route>
         </Route>
 
@@ -128,7 +129,7 @@ function App() {
             <Route path="overview" element={<EmployeeDashboardOveriew />} />
             <Route path="leave" element={<EmployeeDashboardLeave />} />
             <Route path="assigned-orders" element={<EmployeeDashboardOrder />} />
-            <Route path="inventory" element={<EmployeeRequestForm />} />
+            <Route path="inventory" element={<EmployeeDashboardInventory />} />
           </Route>
         </Route>
 
