@@ -412,7 +412,12 @@ const Order = () => {
                           {service.name}
                         </h3>
                         <p className="text-sm text-indigo-600">
-                          ${service.price.toFixed(2)} per item
+                          ₦
+                          {service.price.toLocaleString("en-NG", {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          })}
+                          per item
                         </p>
                       </div>
                     </div>

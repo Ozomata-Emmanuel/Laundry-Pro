@@ -31,7 +31,7 @@ const NavigationBar = () => {
   }
 
   function accessOrder(){
-    const currentLogin = localStorage.getItem('laundry_user_id');
+    const currentLogin = localStorage.getItem('laundry_customer_id');
     if(!currentLogin){
       navigate("/auth")
       toast.info("Please login to access this feature", {

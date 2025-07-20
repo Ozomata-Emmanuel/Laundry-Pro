@@ -7,8 +7,8 @@ const getUserFromToken = () => {
     const ManagerToken = localStorage.getItem('ManagerToken');
     const EmployeeToken = localStorage.getItem('EmployeeToken');
     const SupplierToken = localStorage.getItem('SupplierToken');
-    if (!AdminToken) return null;
-    const decoded = jwtDecode(AdminToken);
+    if (!CustomerToken) return null;
+    const decoded = jwtDecode(CustomerToken);
     return decoded;
   } catch (err) {
     return null;

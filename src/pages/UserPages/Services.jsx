@@ -20,8 +20,7 @@ const Services = () => {
   const mainServices = [
     {
       name: "Basic Wash & Fold",
-      price: "$1.50",
-      perItem: "per pound",
+      price: "500 - ₦2,000",
       description: "Perfect for everyday laundry needs",
       features: [
         "Washed with premium detergents",
@@ -34,8 +33,7 @@ const Services = () => {
     },
     {
       name: "Premium Care",
-      price: "$3.00",
-      perItem: "per pound",
+      price: "2,000",
       description: "For clothes needing extra attention",
       features: [
         "All Basic Wash & Fold features",
@@ -49,8 +47,7 @@ const Services = () => {
     },
     {
       name: "Dry Cleaning",
-      price: "$8.99",
-      perItem: "per item",
+      price: "4,000 - ₦6,000",
       description: "Professional care for delicate fabrics",
       features: [
         "Expert stain treatment",
@@ -182,7 +179,7 @@ const Services = () => {
                   {plan.icon}
                   <h3 className="text-2xl font-bold text-[#000980] mb-2">{plan.name}</h3>
                   <div className="flex justify-center items-baseline mb-4">
-                    <span className="text-4xl font-bold">{plan.price}</span>
+                    <span className="text-4xl font-bold">₦{plan.price}</span>
                     <span className="text-gray-500 ml-2">{plan.perItem}</span>
                   </div>
                   <p className="text-gray-600 mb-6">{plan.description}</p>
