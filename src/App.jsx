@@ -23,6 +23,7 @@ import SupplierOrderManagement from './pages/SupplierDashboardPages/SupplierOrde
 import SupplierDeliveryTracking from './pages/SupplierDashboardPages/SupplierDeliveryTracking';
 import SupplierInvoiceManagement from './pages/SupplierDashboardPages/SupplierInvoiceManagement';
 import SupplierSettings from './pages/SupplierDashboardPages/SupplierSettings';
+import SupplierDashboardLogin from './pages/SupplierDashboardPages/SupplierDashboardLogin';
 import AdminDashboardPage from './pages/AdminDashboardPages/AdminDashboardPage';
 import AdminDashboardOverview from './pages/AdminDashboardPages/AdminDashboardOverview';
 import AdminRegisterSupplier from './pages/AdminDashboardPages/AdminRegisterSupplier';
@@ -83,8 +84,8 @@ function App() {
         <Route path="/order" element={ <Order />} />
         <Route path="/terms-of-service" element={<TermsOfService />} />
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+        <Route path="/supplier-dashboard/login" element={<SupplierDashboardLogin />} />
 
-        <Route element={<ProtectedRoute allowedRoles={['supplier', 'admin']} />}>
           <Route path="/supplier-dashboard" element={<SupplierDashboardPage />}>
             <Route index element={<SupplierDashboardOverview />} />
             <Route path="overview" element={<SupplierDashboardOverview />} />
@@ -94,7 +95,6 @@ function App() {
             <Route path="invoice" element={<SupplierInvoiceManagement />} />
             <Route path="setting" element={<SupplierSettings />} />
           </Route>
-        </Route>
 
         <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
           <Route path="/admin-dashboard" element={<AdminDashboardPage />}>

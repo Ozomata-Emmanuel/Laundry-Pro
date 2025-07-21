@@ -174,14 +174,13 @@ const AdminFulfillmentDashboard = () => {
       </div>
       
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Request List */}
         <div className="lg:col-span-2">
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Order #</th>
+                    {/* <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Order #</th> */}
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Employee</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Items</th>
@@ -225,11 +224,11 @@ const AdminFulfillmentDashboard = () => {
                           selectedRequest?._id === request._id ? 'bg-blue-50' : ''
                         }`}
                       >
-                        <td className="px-6 py-4 whitespace-nowrap">
+                        {/* <td className="px-6 py-4 whitespace-nowrap">
                           <span className="text-blue-600 font-medium">
-                            {request.order?.order_number || 'N/A'}
+                            #{request.order?.id.slice(-6).toUpperCase() || 'N/A'}
                           </span>
-                        </td>
+                        </td> */}
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center">
                             <div className="flex-shrink-0 h-10 w-10 bg-blue-100 rounded-full flex items-center justify-center">
@@ -294,7 +293,6 @@ const AdminFulfillmentDashboard = () => {
           </div>
         </div>
 
-        {/* Request Details Panel */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 h-fit sticky top-6">
           <div className="p-6">
             <h2 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">

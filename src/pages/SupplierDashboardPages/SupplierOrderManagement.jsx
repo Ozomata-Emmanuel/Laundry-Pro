@@ -1,128 +1,283 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { toast } from 'react-toastify';
+import { FaSpinner, FaCheck, FaTimes, FaTruck, FaBoxOpen, FaInfoCircle } from 'react-icons/fa';
 
 const SupplierOrderManagement = () => {
-  const orders = [
-    { id: 'ORD-2023-001', date: '2023-10-15', items: ['Eco-Friendly Detergent', 'Fabric Softener'], quantity: [20, 15], status: 'Delivered', total: '$450.00' },
-    { id: 'ORD-2023-002', date: '2023-10-12', items: ['Stain Remover', 'Bleach'], quantity: [30, 10], status: 'Shipped', total: '$320.00' },
-    { id: 'ORD-2023-003', date: '2023-10-10', items: ['Dry Cleaning Solvent'], quantity: [25], status: 'Processing', total: '$375.00' },
-    { id: 'ORD-2023-004', date: '2023-10-08', items: ['Eco-Friendly Detergent', 'Fabric Softener', 'Stain Remover'], quantity: [15, 10, 20], status: 'Pending', total: '$525.00' },
-    { id: 'ORD-2023-005', date: '2023-10-05', items: ['Bleach', 'Dry Cleaning Solvent'], quantity: [15, 20], status: 'Cancelled', total: '$400.00' }
-  ];
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [statusFilter, setStatusFilter] = useState('all');
 
-  const [selectedStatus, setSelectedStatus] = useState('All');
-  const statuses = ['All', 'Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'];
+  useEffect(() => {
+    fetchOrders();
+  }, [statusFilter]);
 
-  const filteredOrders = selectedStatus === 'All' 
-    ? orders 
-    : orders.filter(order => order.status === selectedStatus);
+  const fetchOrders = async () => {
+    const supplierId = localStorage.getItem('supplier_id');
+    const supplierToken = localStorage.getItem('supplierToken');
+    
+    if (!supplierId) return;
 
-  const getStatusColor = (status) => {
-    switch(status) {
-      case 'Delivered': return 'bg-green-100 text-green-800';
-      case 'Shipped': return 'bg-blue-100 text-blue-800';
-      case 'Processing': return 'bg-yellow-100 text-yellow-800';
-      case 'Pending': return 'bg-orange-100 text-orange-800';
-      case 'Cancelled': return 'bg-red-100 text-red-800';
-      default: return 'bg-gray-100 text-gray-800';
+    setLoading(true);
+    try {
+      const response = await axios.get(
+        `http://localhost:5002/laundry/api/reorder/requests/all/${supplierId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${supplierToken}`,
+          },
+        }
+      );
+      
+      let filteredOrders = response.data.data;
+      if (statusFilter !== 'all') {
+        filteredOrders = filteredOrders.filter(order => order.status === statusFilter);
+      }
+      
+      setOrders(filteredOrders);
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Failed to fetch orders');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const updateOrderStatus = async (orderId, status) => {
+    const supplierToken = localStorage.getItem('supplierToken');
+    
+    try {
+      setLoading(true);
+      await axios.put(
+        `http://localhost:5002/laundry/api/reorder/requests/${orderId}/fulfill`,
+        {
+          headers: {
+            Authorization: `Bearer ${supplierToken}`,
+          },
+        }
+      );
+      toast.success(`Order status updated to ${status}`);
+      fetchOrders();
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Failed to update order status');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getStatusBadge = (status) => {
+    switch (status) {
+      case 'pending':
+        return <span className="px-2 py-1 text-xs font-medium rounded-full bg-yellow-100 text-yellow-800">Pending</span>;
+      case 'approved':
+        return <span className="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800">Approved</span>;
+      case 'fulfilled':
+        return <span className="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">Fulfilled</span>;
+      case 'rejected':
+        return <span className="px-2 py-1 text-xs font-medium rounded-full bg-red-100 text-red-800">Rejected</span>;
+      case 'partially_fulfilled':
+        return <span className="px-2 py-1 text-xs font-medium rounded-full bg-purple-100 text-purple-800">Partially Fulfilled</span>;
+      default:
+        return <span className="px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-800">{status}</span>;
     }
   };
 
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold text-gray-800 mb-6">Order Management</h1>
-      
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
-        <div className="flex items-center space-x-4">
-          <div className="relative">
-            <input
-              type="text"
-              placeholder="Search orders..."
-              className="pl-10 pr-4 py-2 border rounded-lg w-full md:w-64"
-            />
-            <svg className="w-5 h-5 text-gray-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-            </svg>
-          </div>
-          
+    <div className="container mx-auto px-4 py-6">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+        <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
+          <FaTruck className="text-blue-600" />
+          Order Management
+        </h1>
+        <div className="mt-4 md:mt-0">
           <select
-            className="px-4 py-2 border rounded-lg"
-            value={selectedStatus}
-            onChange={(e) => setSelectedStatus(e.target.value)}
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className="border border-gray-300 rounded-md px-3 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
-            {statuses.map(status => (
-              <option key={status} value={status}>{status}</option>
-            ))}
+            <option value="all">All Statuses</option>
+            <option value="pending">Pending</option>
+            <option value="approved">Approved</option>
+            <option value="fulfilled">Fulfilled</option>
+            <option value="partially_fulfilled">Partially Fulfilled</option>
+            <option value="rejected">Rejected</option>
           </select>
         </div>
-        
-        <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center">
-          <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-          </svg>
-          Create New Order
-        </button>
       </div>
-      
-      <div className="bg-white rounded-lg shadow overflow-hidden">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Order ID</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Items</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {filteredOrders.map((order) => (
-              <tr key={order.id}>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="font-medium text-blue-600">{order.id}</div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {order.date}
-                </td>
-                <td className="px-6 py-4">
-                  <div className="text-sm text-gray-900">
-                    {order.items.map((item, index) => (
-                      <div key={index} className="flex justify-between max-w-xs">
-                        <span>{item}</span>
-                        <span className="text-gray-500">{order.quantity[index]} units</span>
+
+      {loading && !orders.length ? (
+        <div className="flex justify-center items-center h-64">
+          <FaSpinner className="animate-spin text-2xl text-blue-600 mr-3" />
+          <span>Loading orders...</span>
+        </div>
+      ) : orders.length === 0 ? (
+        <div className="bg-blue-50 p-6 rounded-lg text-center">
+          <FaBoxOpen className="mx-auto text-3xl text-blue-400 mb-2" />
+          <p className="text-gray-600">No orders found matching your criteria</p>
+        </div>
+      ) : (
+        <div className="bg-white rounded-lg shadow overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Order ID</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Items</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Requested On</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {orders.map(order => (
+                  <tr key={order._id} className="hover:bg-gray-50">
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className="text-blue-600 font-medium">#{order._id.slice(-6).toUpperCase()}</span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="space-y-1">
+                        {order.items.slice(0, 2).map(item => (
+                          <div key={item._id} className="flex items-center">
+                            <span className="font-medium mr-2">{item.quantity}x</span>
+                            <span>{item.name}</span>
+                          </div>
+                        ))}
+                        {order.items.length > 2 && (
+                          <span className="text-sm text-gray-500">+{order.items.length - 2} more items</span>
+                        )}
                       </div>
-                    ))}
-                  </div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(order.status)}`}>
-                    {order.status}
-                  </span>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                  {order.total}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                  <button className="text-blue-600 hover:text-blue-900 mr-3">View</button>
-                  {order.status === 'Pending' && (
-                    <button className="text-green-600 hover:text-green-900">Process</button>
-                  )}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-      
-      <div className="mt-6 flex justify-between items-center">
-        <div className="text-sm text-gray-500">
-          Showing 1 to {filteredOrders.length} of {filteredOrders.length} orders
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      {getStatusBadge(order.status)}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      {new Date(order.createdAt).toLocaleDateString()}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap space-x-2">
+                      {order.status === 'approved' && (
+                        <>
+                          <button
+                            onClick={() => updateOrderStatus(order._id, 'fulfilled')}
+                            disabled={loading}
+                            className="inline-flex items-center px-2.5 py-1.5 border border-transparent text-xs font-medium rounded shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                          >
+                            <FaCheck className="mr-1" /> Fulfill
+                          </button>
+                          <button
+                            onClick={() => updateOrderStatus(order._id, 'partially_fulfilled')}
+                            disabled={loading}
+                            className="inline-flex items-center px-2.5 py-1.5 border border-transparent text-xs font-medium rounded shadow-sm text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+                          >
+                            Partial
+                          </button>
+                        </>
+                      )}
+                      <button
+                        onClick={() => setSelectedOrder(order)}
+                        className="inline-flex items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                      >
+                        <FaInfoCircle className="mr-1" /> Details
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
-        <div className="flex space-x-2">
-          <button className="px-3 py-1 border rounded-md text-gray-700 bg-gray-100">Previous</button>
-          <button className="px-3 py-1 border rounded-md text-gray-700 bg-gray-100">Next</button>
+      )}
+
+      {selectedOrder && (
+        <div className="fixed inset-0 bg-[#00000eec] backdrop-blur-xs flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-medium">Order Details</h3>
+              <button 
+                onClick={() => setSelectedOrder(null)}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                <FaTimes />
+              </button>
+            </div>
+            
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-sm text-gray-500">Order ID</p>
+                  <p className="font-medium">#{selectedOrder._id.slice(-6).toUpperCase()}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Status</p>
+                  <p>{getStatusBadge(selectedOrder.status)}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Requested On</p>
+                  <p className="font-medium">{new Date(selectedOrder.createdAt).toLocaleString()}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Requested By</p>
+                  <p className="font-medium">
+                    {selectedOrder.requestedBy?.first_name || 'N/A'}
+                  </p>
+                </div>
+              </div>
+
+              <div className="border-t border-gray-200 pt-4">
+                <h4 className="font-medium mb-3">Items</h4>
+                <div className="space-y-3">
+                  {selectedOrder.items.map((item, index) => (
+                    <div key={index} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                      <div>
+                        <p className="font-medium">{item.quantity}x {item.name}</p>
+                        <p className="text-sm text-gray-500">{item.category}</p>
+                      </div>
+                      <p className="text-sm">{item.unit}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {selectedOrder.notes && (
+                <div className="border-t border-gray-200 pt-4">
+                  <h4 className="font-medium mb-2">Notes</h4>
+                  <p className="text-gray-700 bg-gray-50 p-3 rounded">{selectedOrder.notes}</p>
+                </div>
+              )}
+
+              <div className="border-t border-gray-200 pt-4 flex justify-end space-x-3">
+                {selectedOrder.status === 'pending' && (
+                  <>
+                    <button
+                      onClick={() => {
+                        updateOrderStatus(selectedOrder._id, 'fulfilled');
+                        setSelectedOrder(null);
+                      }}
+                      className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
+                    >
+                      Mark as Fulfilled
+                    </button>
+                    <button
+                      onClick={() => {
+                        updateOrderStatus(selectedOrder._id, 'partially_fulfilled');
+                        setSelectedOrder(null);
+                      }}
+                      className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700"
+                    >
+                      Partial Fulfillment
+                    </button>
+                  </>
+                )}
+                <button
+                  onClick={() => setSelectedOrder(null)}
+                  className="px-4 py-2 bg-gray-200 rounded-md hover:bg-gray-300"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };

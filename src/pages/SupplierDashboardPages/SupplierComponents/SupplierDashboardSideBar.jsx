@@ -10,16 +10,18 @@ const SupplierDashboardSideBar = () => {
 
   const navItems = [
     { path: "/supplier-dashboard/overview", name: "Overview", icon: <FiHome className="h-5 w-5" /> },
-    { path: "/supplier-dashboard/inventory", name: "Inventory", icon: <AiOutlineAppstore className="h-5 w-5" /> },
     { path: "/supplier-dashboard/order", name: "Orders", icon: <FiPackage className="h-5 w-5" /> },
-    { path: "/supplier-dashboard/delivery", name: "Delivery", icon: <FiTruck className="h-5 w-5" /> },
-    { path: "/supplier-dashboard/invoice", name: "Invoices", icon: <FiFileText className="h-5 w-5" /> },
-    { path: "/supplier-dashboard/setting", name: "Settings", icon: <FiSettings className="h-5 w-5" /> },
+    // { path: "/supplier-dashboard/inventory", name: "Inventory", icon: <AiOutlineAppstore className="h-5 w-5" /> },
+    // { path: "/supplier-dashboard/delivery", name: "Delivery", icon: <FiTruck className="h-5 w-5" /> },
+    // { path: "/supplier-dashboard/invoice", name: "Invoices", icon: <FiFileText className="h-5 w-5" /> },
+    // { path: "/supplier-dashboard/setting", name: "Settings", icon: <FiSettings className="h-5 w-5" /> },
   ];
 
   const handleLogout = () => {
     toast.success("Signed out successfully");
-    navigate('/')
+    localStorage.removeItem('supplierToken');
+    localStorage.removeItem('supplier_id');
+    navigate('/supplier-dashboard/login')
   };
 
   return (

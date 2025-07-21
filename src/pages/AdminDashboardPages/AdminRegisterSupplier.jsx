@@ -2,13 +2,13 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 
-
 const AdminRegisterSupplier = () => {
   const [formData, setFormData] = useState({
     companyName: '',
     contactPerson: '',
     email: '',
     phone: '',
+    password: '',
     suppliedItems: []
   });
   const [loading, setLoading] = useState(false);
@@ -32,7 +32,7 @@ const AdminRegisterSupplier = () => {
     e.preventDefault();
     
     if (formData.suppliedItems.length === 0) {
-      alert('Please select at least one supplied item');
+      toast.error('Please select at least one supplied item');
       return;
     }
 
@@ -49,42 +49,22 @@ const AdminRegisterSupplier = () => {
           }
         }
       );
+      
       if(response.data.success){
-        toast.success("Supplier registration successful!", {
-          position: "top-right",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-        });
+        toast.success("Supplier registration successful!");
         setFormData({
           companyName: '',
           contactPerson: '',
           email: '',
           phone: '',
+          password: '',
           suppliedItems: []
         });
       } else {
-        toast.error(resp.data.message || "An error occured while registering the Supplier", {
-          position: "top-right",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-        });
+        toast.error(response.data.message || "An error occurred while registering the Supplier");
       }
     } catch (error) {
-      console.log(error)
-      toast.error(error || "An error occured while registering the Supplier", {
-        position: "top-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-      });
+      toast.error(error.response?.data?.message || "An error occurred while registering the Supplier");
     } finally {
       setLoading(false);
     }
@@ -161,6 +141,22 @@ const AdminRegisterSupplier = () => {
               onChange={handleChange}
               required
               placeholder="e.g. 08012345678"
+              className="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Password <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="password"
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+              required
+              minLength="6"
+              placeholder="At least 6 characters"
               className="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
             />
           </div>
