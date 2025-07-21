@@ -50,7 +50,7 @@ import AdminOrderManagement from './pages/AdminDashboardPages/AdminOrderManageme
 import VerifyEmail from './components/verifyEmail';
 import NotFound from './components/NotFound';
 import ProtectedRoute from './components/ProtectedRoute';
-import NotAuthorized from './components/Notauthorized';
+import NotAuthorized from './components/NotAuthorized';
 import PrivacyPolicy from './components/PrivacyPolicy';
 import TermsOfService from './components/TermsOfService';
 import AdminFulfillmentDashboard from './pages/AdminDashboardPages/AdminFulfillmentDashboard';
