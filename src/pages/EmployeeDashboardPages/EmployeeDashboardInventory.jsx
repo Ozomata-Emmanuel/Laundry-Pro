@@ -5,7 +5,7 @@ import { toast } from 'react-toastify';
 import { DataContext } from '../../context/DataContext';
 
 const EmployeeDashboardInventory = () => {
-  const { user } = useContext(DataContext);
+  const { users } = useContext(DataContext);
   const [requests, setRequests] = useState([]);
   const [inventoryItems, setInventoryItems] = useState([]);
   const [assignedOrders, setAssignedOrders] = useState([]);
@@ -20,13 +20,14 @@ const EmployeeDashboardInventory = () => {
   });
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
+  const employeeUser = users.employee;
 
   const fetchRequests = async () => {
     const EmployeeToken = localStorage.getItem("EmployeeToken");
     try {
       setLoading(prev => ({ ...prev, requests: true }));
       const res = await axios.get(
-        `http://localhost:5002/laundry/api/employee-requests/employee/${user.id}`,
+        `http://localhost:5002/laundry/api/employee-requests/employee/${employeeUser.id}`,
         {
           headers: {
             Authorization: `Bearer ${EmployeeToken}`,
@@ -67,7 +68,7 @@ const EmployeeDashboardInventory = () => {
     try {
       setLoading(prev => ({ ...prev, orders: true }));
       const res = await axios.get(
-        `http://localhost:5002/laundry/api/orders/employee/${user.id}`,
+        `http://localhost:5002/laundry/api/orders/employee/${employeeUser.id}`,
         {
           headers: {
             Authorization: `Bearer ${EmployeeToken}`,
@@ -126,12 +127,12 @@ const EmployeeDashboardInventory = () => {
   };
 
   useEffect(() => {
-    if (user?.id) {
+    if (employeeUser?.id) {
       fetchRequests();
       fetchInventory();
       fetchAssignedOrders();
     }
-  }, [user]);
+  }, [employeeUser]);
 
   const statusColors = {
     pending: 'bg-yellow-100 text-yellow-800',

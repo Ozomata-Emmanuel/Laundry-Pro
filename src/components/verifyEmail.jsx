@@ -9,7 +9,6 @@ const VerifyEmail = () => {
   const [code, setCode] = useState('');
   const [status, setStatus] = useState('failed');
   const [error, setError] = useState('');
-  const [resending, setResending] = useState(false);
 
   const handleCodeChange = (e) => {
     const value = e.target.value;
@@ -35,7 +34,7 @@ const VerifyEmail = () => {
       
       if (response.data.success) {
         setStatus('verified');
-        setTimeout(() => navigate('/'), 2000);
+        setTimeout(() => navigate('/auth'), 2000);
       } else {
         setStatus('failed');
         setError(response.data.message || 'Verification failed');
@@ -46,17 +45,6 @@ const VerifyEmail = () => {
     }
   };
 
-  const handleResendCode = async () => {
-    setResending(true);
-    try {
-      await axios.post('/api/auth/resend-verification');
-      setError('New verification code sent!');
-    } catch (err) {
-      setError(err.response?.data?.message || 'Failed to resend code');
-    } finally {
-      setResending(false);
-    }
-  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-gray-100 flex flex-col justify-center px-4">
@@ -145,11 +133,10 @@ const VerifyEmail = () => {
           <div className="mt-6 text-center text-sm text-gray-500">
             Didn't receive a code?{' '}
             <button 
-              onClick={handleResendCode}
-              disabled={resending}
+              onClick={()=> navigate('/resend-verification-code')}
               className="text-blue-600 font-medium hover:text-blue-500 disabled:opacity-50"
             >
-              {resending ? 'Sending...' : 'Resend code'}
+              Resend code
             </button>
           </div>
         )}

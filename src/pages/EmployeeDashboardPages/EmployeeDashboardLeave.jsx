@@ -17,7 +17,7 @@ import {
 } from "react-icons/fa";
 
 const EmployeeDashboardLeave = () => {
-  const { user } = useContext(DataContext);
+  const { users } = useContext(DataContext);
   const [leaves, setLeaves] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -33,7 +33,8 @@ const EmployeeDashboardLeave = () => {
   });
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
-  const employeeId = user?.id;
+  const employeeUser = users.employee;
+  const employeeId = employeeUser?.id;
 
   useEffect(() => {
     fetchEmployeeLeaves();

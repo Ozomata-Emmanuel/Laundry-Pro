@@ -1,46 +1,58 @@
 import axios from "axios";
-import { useEffect } from "react";
-import { createContext, useState } from "react";
+import { useEffect, createContext, useState } from "react";
 
 export const DataContext = createContext();
 
-function DataProvider({children}) {
-  const localstorageCustomerData = localStorage.getItem("laundry_customer_id");
-  const localstorageAdminData = localStorage.getItem("laundry_admin_id");
-  const localstorageManagerData = localStorage.getItem("laundry_manager_id");
-  const localstorageEmployeeData = localStorage.getItem("laundry_employee_id");
-  const localstorageSupplierData = localStorage.getItem("laundry_supplier_id");
-  const [user, setUser] = useState({});
-  const [load, setLoad] = useState(false);
-
-  const getUser = async(id)=> {
-    const resp = await axios.get(`http://localhost:5002/laundry/api/user/${id}`);
-    setLoad(true)
-    console.log(resp.data.data)
-    if (resp.data.success){
-      setUser(resp.data.data);
-    } else {
-      setLoad(false);
-    }
+function DataProvider({ children }) {
+  const localstorageData = {
+    customer: localStorage.getItem("laundry_customer_id"),
+    admin: localStorage.getItem("laundry_admin_id"),
+    manager: localStorage.getItem("laundry_manager_id"),
+    employee: localStorage.getItem("laundry_employee_id"),
+    supplier: localStorage.getItem("laundry_supplier_id"),
   };
 
-  
-  useEffect(() => {
-    if (localstorageCustomerData) {
-      getUser(localstorageCustomerData);
-    } else if (localstorageAdminData) {
-      getUser(localstorageAdminData);
-    } else if (localstorageManagerData) {
-      getUser(localstorageManagerData);
-    } else if (localstorageEmployeeData) {
-      getUser(localstorageEmployeeData);
-    } else if (localstorageSupplierData) {
-      getUser(localstorageSupplierData);
-    } else {
-      setUser({})  
-    };
-  }, []);
-  return <DataContext.Provider value={{ user, setUser, getUser, load }}>{children}</DataContext.Provider>
-};
+  const [users, setUsers] = useState({});
+  const [load, setLoad] = useState(false);
 
-export default DataProvider
+  const getUser = async (id) => {
+    try {
+      const resp = await axios.get(`http://localhost:5002/laundry/api/user/${id}`);
+      if (resp.data.success) {
+        return resp.data.data; 
+      }
+    } catch (error) {
+      console.error("Error fetching user", error);
+    }
+    return null;
+  };
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      setLoad(false);
+      const fetchedUsers = {};
+
+      for (const [role, id] of Object.entries(localstorageData)) {
+        if (id) {
+          const userData = await getUser(id);
+          if (userData) {
+            fetchedUsers[role] = userData;
+          }
+        }
+      }
+
+      setUsers(fetchedUsers);
+      setLoad(true);
+    };
+
+    fetchUsers();
+  }, []);
+
+  return (
+    <DataContext.Provider value={{ users, setUsers, getUser, load }}>
+      {children}
+    </DataContext.Provider>
+  );
+}
+
+export default DataProvider;

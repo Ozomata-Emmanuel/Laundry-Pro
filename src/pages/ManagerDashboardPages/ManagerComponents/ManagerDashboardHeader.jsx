@@ -4,13 +4,15 @@ import axios from 'axios';
 import { FaBell, FaUserCircle, FaChevronDown } from 'react-icons/fa';
 
 const ManagerDashboardHeader = () => {
-  const { user } = useContext(DataContext);
+  const { users } = useContext(DataContext);
   const [branch, setBranch] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('')
   const [showDropdown, setShowDropdown] = useState(false);
   const [orders, setOrders] = useState([]);
   const hasUnassignedOrders = orders.some(order => !order.assigned_employee_id);
+  const managerUser = users.manager;
+
 
 
   const fetchOrders = async (branchId) => {
@@ -78,11 +80,11 @@ const ManagerDashboardHeader = () => {
   };
 
   useEffect(() => {
-    if (user?.branch) {
-      fetchBranch(user.branch);
-      fetchOrders(user.branch);
+    if (managerUser?.branch) {
+      fetchBranch(managerUser.branch);
+      fetchOrders(managerUser.branch);
     }
-  }, [user]);
+  }, [managerUser]);
 
 
   return (
@@ -119,7 +121,13 @@ const ManagerDashboardHeader = () => {
                 <FaUserCircle className="text-blue-600 text-xl" />
               </div>
               <span className="hidden md:inline-block font-medium text-gray-700">
-                {user?.first_name || 'Manager'}
+                {
+                  managerUser ? (
+                    managerUser.first_name
+                  ) : (
+                    <div className="">Manager</div>
+                  )
+                }
               </span>
               <FaChevronDown className={`text-gray-500 duration-150 transition-transform ${showDropdown ? 'transform rotate-180' : ''}`} />
             </button>

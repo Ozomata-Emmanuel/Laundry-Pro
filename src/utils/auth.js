@@ -1,18 +1,26 @@
-import { jwtDecode } from 'jwt-decode';
+import { jwtDecode } from 'jwt-decode';  // fixed import
 
-const getUserFromToken = () => {
+const getUsersFromTokens = () => {
+  const roles = ['Admin', 'Customer', 'Manager', 'Employee', 'Supplier'];
+  const users = {};
+
   try {
-    const AdminToken = localStorage.getItem('AdminToken');
-    const CustomerToken = localStorage.getItem('CustomerToken');
-    const ManagerToken = localStorage.getItem('ManagerToken');
-    const EmployeeToken = localStorage.getItem('EmployeeToken');
-    const SupplierToken = localStorage.getItem('SupplierToken');
-    if (!CustomerToken) return null;
-    const decoded = jwtDecode(CustomerToken);
-    return decoded;
+    roles.forEach(role => {
+      const token = localStorage.getItem(`${role}Token`);
+      if (token) {
+        const decoded = jwtDecode(token);
+        users[role] = decoded;
+      }
+    });
+
+    if (Object.keys(users).length === 0) {
+      return null;
+    }
+    return users;
   } catch (err) {
+    console.error('Error decoding tokens:', err);
     return null;
   }
 };
 
-export default getUserFromToken
+export default getUsersFromTokens;

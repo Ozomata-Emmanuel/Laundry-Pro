@@ -11,7 +11,7 @@ import {
 } from "react-icons/fa";
 
 const ManagerDashboardEmployees = () => {
-  const { user } = useContext(DataContext);
+  const { users } = useContext(DataContext);
   const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -23,11 +23,13 @@ const ManagerDashboardEmployees = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
 
+  const managerUser = users.manager;
+
   useEffect(() => {
-    if (user?.branch) {
-      fetchEmployees(user.branch);
+    if (managerUser?.branch) {
+      fetchEmployees(managerUser.branch);
     }
-  }, [user]);
+  }, [managerUser]);
 
   const fetchEmployees = async (branchId) => {
     const ManagerToken = localStorage.getItem("ManagerToken");

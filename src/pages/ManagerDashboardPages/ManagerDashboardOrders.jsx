@@ -29,7 +29,7 @@ import {
 import { toast } from "react-toastify";
 
 const ManagerDashboardOrders = () => {
-  const { user } = useContext(DataContext);
+  const { users } = useContext(DataContext);
   const [orders, setOrders] = useState([]);
   const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -41,12 +41,14 @@ const ManagerDashboardOrders = () => {
   const [statusFilter, setStatusFilter] = useState("all");
   const [markingPaid, setMarkingPaid] = useState(false);
 
+  const managerUser = users.manager;
+
   useEffect(() => {
-    if (user?.branch) {
-      fetchOrders(user.branch);
-      fetchEmployees(user.branch);
+    if (managerUser?.branch) {
+      fetchOrders(managerUser.branch);
+      fetchEmployees(managerUser.branch);
     }
-  }, [user]);
+  }, [managerUser]);
 
   const fetchOrders = async (branchId) => {
     const ManagerToken = localStorage.getItem("ManagerToken");

@@ -1,11 +1,16 @@
 import { Navigate, Outlet } from 'react-router-dom';
-import getUserFromToken from '../utils/auth';
+import getUsersFromTokens from '../utils/auth';
 
 const ProtectedRoute = ({ allowedRoles }) => {
-  const user = getUserFromToken();
-  if (!user) return <Navigate to="/auth" replace />;
+  const users = getUsersFromTokens();
 
-  if (!allowedRoles.includes(user.role)) {
+  if (!users) return <Navigate to="/auth" replace />;
+
+  const isAllowed = Object.values(users).some(user => 
+    allowedRoles.includes(user.role)
+  );
+
+  if (!isAllowed) {
     return <Navigate to="/not-authorized" replace />;
   }
 

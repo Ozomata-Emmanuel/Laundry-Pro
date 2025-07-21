@@ -13,6 +13,8 @@ import {
   FiUserPlus 
 } from "react-icons/fi";
 import { FaCodeBranch } from "react-icons/fa";
+import { RiInboxUnarchiveLine } from "react-icons/ri";
+
 import { toast } from "react-toastify";
 
 const AdminDashboardSideBar = () => {
@@ -29,7 +31,7 @@ const AdminDashboardSideBar = () => {
     { path: "/admin-dashboard/register-supplier", name: "Add Supplier", icon: <FiUserPlus className="h-5 w-5" /> },
     { path: "/admin-dashboard/manage-locations", name: "Branches", icon: <FaCodeBranch className="h-5 w-5" /> },
     { path: "/admin-dashboard/reports", name: "Reports", icon: <FiTrendingUp className="h-5 w-5" /> },
-    { path: "/admin-dashboard/employee-requests", name: "Employee Requests", icon: <FiTrendingUp className="h-5 w-5" /> },
+    { path: "/admin-dashboard/employee-requests", name: "Employee Requests", icon: <RiInboxUnarchiveLine className="h-5 w-5" /> },
     
     // { path: "/admin-dashboard/settings", name: "Settings", icon: <FiSettings className="h-5 w-5" /> },
   ];

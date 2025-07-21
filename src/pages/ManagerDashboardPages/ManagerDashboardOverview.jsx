@@ -15,7 +15,7 @@ import {
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 
 const ManagerDashboardOverview = () => {
-  const { user } = useContext(DataContext);
+  const { users } = useContext(DataContext);
   const [stats, setStats] = useState({
     totalOrders: 0,
     pendingOrders: 0,
@@ -30,15 +30,16 @@ const ManagerDashboardOverview = () => {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const managerUser = users.manager;
 
   // Sample color palette
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
 
   useEffect(() => {
-    if (user?.branch) {
-      fetchStats(user.branch);
+    if (managerUser?.branch) {
+      fetchStats(managerUser.branch);
     }
-  }, [user]);
+  }, [managerUser]);
 
 const fetchStats = async (branchId) => {
   const ManagerToken = localStorage.getItem("ManagerToken");

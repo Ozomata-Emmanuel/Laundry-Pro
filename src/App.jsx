@@ -15,6 +15,7 @@ import Profile from './pages/UserPages/Profile';
 import DataProvider from './context/DataContext';
 import ResetPassword from './components/ResetPassword';
 import ForgotPassword from './components/ForgotPassword';
+import ResendVerification from './components/ResendVerification';
 import SupplierDashboardPage from './pages/SupplierDashboardPages/SupplierDashboardPage';
 import SupplierDashboardOverview from './pages/SupplierDashboardPages/SupplierDashboardOverview';
 import SupplierInventoryManagement from './pages/SupplierDashboardPages/SupplierInventoryManagement';
@@ -75,6 +76,7 @@ function App() {
         <Route path="/profile" element={<Profile />} />
         <Route path="/verify-email" element={<VerifyEmail />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/resend-verification-code" element={<ResendVerification />} />
         <Route path="/reset-password/:token" element={<ResetPassword />} />
         <Route path="/user-dashboard" element={<UserDashboard />} />
         <Route path="/not-authorized" element={<NotAuthorized />} />
@@ -111,7 +113,7 @@ function App() {
           </Route>
         </Route>
 
-        <Route element={<ProtectedRoute allowedRoles={['admin', 'manager']} />}>
+        <Route element={<ProtectedRoute allowedRoles={['manager']} />}>
           <Route path="/manager-dashboard" element={<ManagerDashboardPage />}>
             <Route index element={<ManagerDashboardOverview />} />
             <Route path="overview" element={<ManagerDashboardOverview />} />

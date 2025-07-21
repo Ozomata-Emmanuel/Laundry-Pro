@@ -1,7 +1,7 @@
 import React from "react";
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { FaTshirt, FaPlus, FaTimes } from 'react-icons/fa';
+import { FaTshirt, FaPlus, FaTimes, FaBoxes, FaExclamationTriangle, FaTags, FaBell } from 'react-icons/fa';
 import { toast } from "react-toastify";
 
 const AdminInventoryDashboard = () => {
@@ -22,18 +22,33 @@ const AdminInventoryDashboard = () => {
     supplier: ''
   });
   const [formErrors, setFormErrors] = useState({});
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterCategory, setFilterCategory] = useState("all");
+
   const statusColors = {
-    Critical: "bg-red-600 text-white",
-    Low: "bg-red-100 text-red-800",
-    Adequate: "bg-green-100 text-green-800",
-    High: "bg-blue-100 text-blue-800",
+    Critical: "bg-red-100 text-red-800 border-l-4 border-red-500",
+    Low: "bg-yellow-100 text-yellow-800 border-l-4 border-yellow-500",
+    Adequate: "bg-green-100 text-green-800 border-l-4 border-green-500",
+    High: "bg-blue-100 text-blue-800 border-l-4 border-blue-500",
   };
 
+  const categories = [
+    "Cleaning",
+    "Packaging",
+    "Personal Care",
+    "Linens",
+    "Other"
+  ];
+
+  const filteredItems = inventoryItems.filter(item => {
+    const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategory = filterCategory === "all" || item.category === filterCategory;
+    return matchesSearch && matchesCategory;
+  });
 
   const handleAddItem = async (e) => {
     e.preventDefault();
     const AdminToken = localStorage.getItem("AdminToken");
-    // Basic validation
     const errors = {};
     if (!newItem.name) errors.name = 'Name is required';
     if (newItem.currentStock < 0) errors.currentStock = 'Stock cannot be negative';
@@ -62,8 +77,9 @@ const AdminInventoryDashboard = () => {
         supplier: ''
       });
       setFormErrors({});
+      toast.success("Item added successfully!");
     } catch (err) {
-      setError(err.response?.data?.error || 'Failed to add item');
+      toast.error(err.response?.data?.error || 'Failed to add item');
     }
   };
 
@@ -107,11 +123,10 @@ const AdminInventoryDashboard = () => {
     fetchData();
   }, []);
 
-  // Add request function
   const handleRequestItems = async (items) => {
     const AdminToken = localStorage.getItem("AdminToken");
     try {
-      const response = await axios.post("http://localhost:5002/laundry/api/requests", {
+      const response = await axios.post("http://localhost:5002/laundry/api/reorder/requests", {
         supplier: selectedSupplierId,
         items: items.map(item => ({
           name: item.name,
@@ -126,12 +141,12 @@ const AdminInventoryDashboard = () => {
           },
         }
       );
+      // /laundry/api/reorder/requests/:id/fulfill
 
       setShowRequestModal(false);
       setSelectedItems([]);
       setSelectedSupplierId('');
 
-      // Optionally refresh inventory data
       fetchInventoryData();
       toast.success(`Inventory request sent`)
     } catch (err) {
@@ -174,11 +189,11 @@ const AdminInventoryDashboard = () => {
   if (error) {
     return (
       <div className="min-h-screen bg-gray-50 p-6 flex items-center justify-center">
-        <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 max-w-md">
+        <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 max-w-md rounded-lg shadow-sm">
           <p className="font-bold">Error</p>
           <p>{error}</p>
           <button 
-            className="mt-2 px-3 py-1 bg-red-600 text-white rounded text-sm"
+            className="mt-2 px-3 py-1 bg-red-600 text-white rounded text-sm hover:bg-red-700 transition"
             onClick={() => window.location.reload()}
           >
             Retry
@@ -191,167 +206,221 @@ const AdminInventoryDashboard = () => {
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-7xl mx-auto">
-        <div className="flex justify-between items-center mb-8">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-gray-800">Inventory Dashboard</h1>
-            <p className="text-gray-600 mt-2">Track and manage your inventory levels</p>
+            <h1 className="text-2xl md:text-3xl font-bold text-gray-800 flex items-center gap-2">
+              <FaBoxes className="text-blue-600" />
+              Inventory Dashboard
+            </h1>
+            <p className="text-gray-600 mt-1">Track and manage your inventory levels</p>
           </div>
-          <button 
-            onClick={() => setShowAddItemModal(true)}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow-md transition duration-200 flex items-center"
+          <div className="flex gap-3 w-full md:w-auto">
+            <button 
+              onClick={() => setShowAddItemModal(true)}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow-md transition duration-200 flex items-center gap-2 w-full md:w-auto justify-center"
+            >
+              <FaPlus />
+              Add New Item
+            </button>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-100 flex items-center gap-4">
+            <div className="bg-blue-100 p-3 rounded-full">
+              <FaBoxes className="text-blue-600 text-xl" />
+            </div>
+            <div>
+              <h3 className="text-gray-500 text-sm font-medium">Total Items</h3>
+              <p className="text-2xl font-bold mt-1">{inventoryItems.length}</p>
+            </div>
+          </div>
+          <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-100 flex items-center gap-4">
+            <div className="bg-red-100 p-3 rounded-full">
+              <FaExclamationTriangle className="text-red-600 text-xl" />
+            </div>
+            <div>
+              <h3 className="text-gray-500 text-sm font-medium">Low Stock</h3>
+              <p className="text-2xl font-bold mt-1 text-red-600">
+                {inventoryItems.filter(item => item.status === 'Low' || item.status === 'Critical').length}
+              </p>
+            </div>
+          </div>
+          <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-100 flex items-center gap-4">
+            <div className="bg-purple-100 p-3 rounded-full">
+              <FaTags className="text-purple-600 text-xl" />
+            </div>
+            <div>
+              <h3 className="text-gray-500 text-sm font-medium">Categories</h3>
+              <p className="text-2xl font-bold mt-1">
+                {[...new Set(inventoryItems.map((item) => item.category))].length}
+              </p>
+            </div>
+          </div>
+          <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-100 flex items-center gap-4">
+            <div className="bg-yellow-100 p-3 rounded-full">
+              <FaBell className="text-yellow-600 text-xl" />
+            </div>
+            <div>
+              <h3 className="text-gray-500 text-sm font-medium">Need Reorder</h3>
+              <p className="text-2xl font-bold mt-1 text-yellow-600">
+                {inventoryItems.filter(item => item.currentStock <= item.reorderLevel).length}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-lg shadow-sm p-4 mb-6 flex flex-col md:flex-row gap-4">
+          <div className="relative flex-grow">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <svg className="h-5 w-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <input
+              type="text"
+              placeholder="Search items..."
+              className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+          <select
+            className="block w-full md:w-48 pl-3 pr-10 py-2 text-base border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
+            value={filterCategory}
+            onChange={(e) => setFilterCategory(e.target.value)}
           >
-            <FaPlus className="mr-2" />
-            Add New Item
-          </button>
+            <option value="all">All Categories</option>
+            {categories.map(category => (
+              <option key={category} value={category}>{category}</option>
+            ))}
+          </select>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-          <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
-            <h3 className="text-gray-500 text-sm font-medium">Total Items</h3>
-            <p className="text-2xl font-bold mt-1">{inventoryItems.length}</p>
-          </div>
-          <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
-            <h3 className="text-gray-500 text-sm font-medium">Low Stock</h3>
-            <p className="text-2xl font-bold mt-1 text-red-600">
-              {inventoryItems.filter(item => item.status === 'Low' || item.status === 'Critical').length}
-            </p>
-          </div>
-          <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
-            <h3 className="text-gray-500 text-sm font-medium">Categories</h3>
-            <p className="text-2xl font-bold mt-1">
-              {[...new Set(inventoryItems.map((item) => item.category))].length}
-            </p>
-          </div>
-          <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
-            <h3 className="text-gray-500 text-sm font-medium">Need Reorder</h3>
-            <p className="text-2xl font-bold mt-1 text-yellow-600">
-              {inventoryItems.filter(item => item.currentStock <= item.reorderLevel).length}
-            </p>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-100">
+        <div className="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-100 mb-8">
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Item Name
                   </th>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Category
                   </th>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Current Stock
                   </th>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Reorder Level
                   </th>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Stock Level
                   </th>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Status
                   </th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {inventoryItems.map((item) => {
-                  const percentage =
-                    (item.currentStock / (item.reorderLevel * 2)) * 100;
-                  const progressColor =
-                    item.status === "Critical"
-                      ? "bg-red-600"
-                      : item.status === "Low"
-                      ? "bg-yellow-500"
-                      : "bg-green-500";
+                {filteredItems.length > 0 ? (
+                  filteredItems.map((item) => {
+                    const percentage =
+                      (item.currentStock / (item.reorderLevel * 2)) * 100;
+                    const progressColor =
+                      item.status === "Critical"
+                        ? "bg-red-500"
+                        : item.status === "Low"
+                        ? "bg-yellow-500"
+                        : "bg-green-500";
 
-                  return (
-                    <tr
-                      key={item.id}
-                      className="hover:bg-gray-50 transition duration-150"
-                    >
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="font-medium text-gray-900">
-                          {item.name}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-gray-500">
-                        {item.category}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-gray-500">
-                        {item.currentStock} {item.unit}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-gray-500">
-                        {item.reorderLevel} {item.unit}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center">
-                          <div className="w-full mr-2">
-                            <div className="w-full bg-gray-200 rounded-full h-2.5">
-                              <div
-                                className={`h-2.5 rounded-full ${progressColor}`}
-                                style={{
-                                  width: `${Math.min(100, percentage)}%`,
-                                }}
-                              ></div>
+                    return (
+                      <tr
+                        key={item.id}
+                        className="hover:bg-gray-50 transition duration-150"
+                      >
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="flex items-center">
+                            <div className="flex-shrink-0 h-10 w-10 bg-blue-100 rounded-full flex items-center justify-center">
+                              <FaTshirt className="text-blue-600" />
+                            </div>
+                            <div className="ml-4">
+                              <div className="font-medium text-gray-900">
+                                {item.name}
+                              </div>
+                              <div className="text-sm text-gray-500">{item.unit}</div>
                             </div>
                           </div>
-                          <span className="text-xs text-gray-500">
-                            {Math.round(percentage)}%
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span className="px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-800">
+                            {item.category}
                           </span>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`px-2 py-1 text-xs font-medium rounded-full ${statusColors[item.status]}`}>
-                          {item.status}
-                        </span>
-                      </td>
-                    </tr>
-                  );
-                })}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-gray-500">
+                          {item.currentStock}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-gray-500">
+                          {item.reorderLevel}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="flex items-center">
+                            <div className="w-full mr-2">
+                              <div className="w-full bg-gray-200 rounded-full h-2.5">
+                                <div
+                                  className={`h-2.5 rounded-full ${progressColor}`}
+                                  style={{
+                                    width: `${Math.min(100, percentage)}%`,
+                                  }}
+                                ></div>
+                              </div>
+                            </div>
+                            <span className="text-xs text-gray-500">
+                              {Math.round(percentage)}%
+                            </span>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span className={`px-3 py-1 text-xs font-medium rounded-full ${statusColors[item.status]}`}>
+                            {item.status}
+                          </span>
+                        </td>
+                      </tr>
+                    );
+                  })
+                ) : (
+                  <tr>
+                    <td colSpan="6" className="px-6 py-4 text-center text-gray-500">
+                      No items found matching your criteria
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>
         </div>
 
-        <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
           <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
-            <h3 className="text-lg font-medium text-gray-800 mb-4">
+            <h3 className="text-lg font-medium text-gray-800 mb-4 flex items-center gap-2">
+              <FaExclamationTriangle className="text-red-500" />
               Stock Alerts
             </h3>
-            <ul className="space-y-3">
+            <div className="space-y-3">
               {inventoryItems
                 .filter(
                   (item) => item.status === "Low" || item.status === "Critical"
                 )
+                .slice(0, 5)
                 .map((item) => (
-                  <li
+                  <div
                     key={item.id}
-                    className="flex justify-between items-center p-3 bg-red-50 rounded-lg"
+                    className="flex justify-between items-center p-3 bg-red-50 rounded-lg border-l-4 border-red-500"
                   >
                     <div>
                       <p className="font-medium">{item.name}</p>
                       <p className="text-sm text-gray-600">
-                        Only {item.currentStock} {item.unit} remaining
+                        Only {item.currentStock} {item.unit} remaining (Reorder at {item.reorderLevel})
                       </p>
                     </div>
                     <button
@@ -363,92 +432,54 @@ const AdminInventoryDashboard = () => {
                     >
                       Reorder
                     </button>
-                  </li>
+                  </div>
                 ))}
-            </ul>
+              {inventoryItems.filter(item => item.status === "Low" || item.status === "Critical").length === 0 && (
+                <div className="text-center py-4 text-gray-500">
+                  <p>No stock alerts at this time</p>
+                </div>
+              )}
+            </div>
           </div>
+
           <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
-            <h3 className="text-lg font-medium text-gray-800 mb-4">
-              Quick Actions
+            <h3 className="text-lg font-medium text-gray-800 mb-4 flex items-center gap-2">
+              <FaTags className="text-blue-500" />
+              Categories Summary
             </h3>
-            <div className="grid grid-cols-2 gap-4">
-              <button className="p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition flex flex-col items-center">
-                <svg
-                  className="w-6 h-6 text-blue-600 mb-2"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                  />
-                </svg>
-                <span className="text-sm font-medium">Add Item</span>
-              </button>
-              <button className="p-4 bg-green-50 rounded-lg hover:bg-green-100 transition flex flex-col items-center">
-                <svg
-                  className="w-6 h-6 text-green-600 mb-2"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"
-                  />
-                </svg>
-                <span className="text-sm font-medium">Import</span>
-              </button>
-              <button className="p-4 bg-purple-50 rounded-lg hover:bg-purple-100 transition flex flex-col items-center">
-                <svg
-                  className="w-6 h-6 text-purple-600 mb-2"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
-                  />
-                </svg>
-                <span className="text-sm font-medium">Export</span>
-              </button>
-              <button className="p-4 bg-yellow-50 rounded-lg hover:bg-yellow-100 transition flex flex-col items-center">
-                <svg
-                  className="w-6 h-6 text-yellow-600 mb-2"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                  />
-                </svg>
-                <span className="text-sm font-medium">Bulk Edit</span>
-              </button>
+            <div className="space-y-4">
+              {categories.map(category => {
+                const count = inventoryItems.filter(item => item.category === category).length;
+                if (count === 0) return null;
+                
+                return (
+                  <div key={category} className="flex items-center justify-between">
+                    <span className="text-gray-700">{category}</span>
+                    <span className="font-medium">{count} items</span>
+                  </div>
+                );
+              })}
             </div>
           </div>
         </div>
-        {/* Request Modal */}
+
         {showRequestModal && (
-          <div className="fixed inset-0 bg-[#04000ccc] flex items-center justify-center p-4 z-50">
+          <div className="fixed inset-0 bg-[#07020fee] backdrop-blur-xs flex items-center justify-center p-4 z-50">
             <div className="bg-white rounded-lg p-6 w-full max-w-md">
-              <h3 className="text-lg font-medium mb-4">Request Items from Supplier</h3>
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-lg font-medium">Request Items</h3>
+                <button 
+                  onClick={() => setShowRequestModal(false)}
+                  className="text-gray-500 hover:text-gray-700"
+                >
+                  <FaTimes />
+                </button>
+              </div>
               
               <div className="mb-4">
                 <label className="block text-sm font-medium text-gray-700 mb-1">Supplier</label>
                 <select 
-                  className="w-full p-2 border rounded-md"
+                  className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   value={selectedSupplierId}
                   onChange={(e) => setSelectedSupplierId(e.target.value)}
                 >
@@ -462,50 +493,45 @@ const AdminInventoryDashboard = () => {
               </div>
 
               <div className="mb-4">
-                <h4 className="font-medium mb-2">Selected Items</h4>
-                <ul className="space-y-2">
+                <h4 className="font-medium mb-2">Items to Order</h4>
+                <div className="bg-gray-50 p-3 rounded-md">
                   {selectedItems.map(item => (
-                    <li key={item._id} className="flex justify-between">
+                    <div key={item._id} className="flex justify-between py-2 border-b border-gray-200 last:border-0">
                       <span>{item.name}</span>
-                      <span>{item.reorderLevel * 2 - item.currentStock} {item.unit}</span>
-                    </li>
+                      <span className="font-medium">
+                        {item.reorderLevel * 2 - item.currentStock} {item.unit}
+                      </span>
+                    </div>
                   ))}
-                </ul>
+                </div>
               </div>
 
-              <div className="flex justify-end space-x-3">
+              <div className="flex justify-end gap-3">
                 <button 
-                  className="px-4 py-2 bg-gray-200 rounded-md"
+                  className="px-4 py-2 bg-gray-200 rounded-md hover:bg-gray-300 transition"
                   onClick={() => setShowRequestModal(false)}
                 >
                   Cancel
                 </button>
                 <button 
-                  className={`px-4 py-2 bg-blue-600 text-white rounded-md ${
-                    isLoading ? 'opacity-70 cursor-not-allowed' : 'hover:bg-blue-700'
+                  className={`px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition ${
+                    !selectedSupplierId ? 'opacity-50 cursor-not-allowed' : ''
                   }`}
                   onClick={() => handleRequestItems(selectedItems)}
-                  disabled={!selectedSupplierId || isLoading}
+                  disabled={!selectedSupplierId}
                 >
-                  {isLoading ? (
-                    <div className="flex items-center justify-center">
-                      <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                      </svg>
-                      Processing...
-                    </div>
-                  ) : 'Submit Request'}
+                  Submit Request
                 </button>
               </div>
             </div>
           </div>
         )}
+
         {showAddItemModal && (
-          <div className="fixed inset-0 bg-[#00010cdc] backdrop-blur-xs flex items-center justify-center p-4 z-50">
+          <div className="fixed inset-0 bg-[#07020fee] backdrop-blur-xs flex items-center justify-center p-4 z-50">
             <div className="bg-white rounded-lg p-6 w-full max-w-md">
               <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-medium">Add New Inventory Item</h3>
+                <h3 className="text-lg font-medium">Add New Item</h3>
                 <button 
                   onClick={() => {
                     setShowAddItemModal(false);
@@ -519,7 +545,6 @@ const AdminInventoryDashboard = () => {
               
               <form onSubmit={handleAddItem}>
                 <div className="space-y-4">
-                  {/* Name Field */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Item Name*</label>
                     <input
@@ -527,81 +552,83 @@ const AdminInventoryDashboard = () => {
                       name="name"
                       value={newItem.name}
                       onChange={handleInputChange}
-                      className={`w-full p-2 border rounded-md ${formErrors.name ? 'border-red-500' : 'border-gray-300'}`}
+                      className={`w-full p-2 border rounded-md outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                        formErrors.name ? 'border-red-500' : 'border-gray-300'
+                      }`}
+                      placeholder="Enter item name"
                     />
                     {formErrors.name && <p className="text-red-500 text-xs mt-1">{formErrors.name}</p>}
                   </div>
 
-                  {/* Category Field */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Category*</label>
-                    <select
-                      name="category"
-                      value={newItem.category}
-                      onChange={handleInputChange}
-                      className="w-full p-2 border border-gray-300 rounded-md"
-                    >
-                      <option value="Cleaning">Cleaning</option>
-                      <option value="Packaging">Packaging</option>
-                      <option value="Personal Care">Personal Care</option>
-                      <option value="Linens">Linens</option>
-                      <option value="Other">Other</option>
-                    </select>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Category*</label>
+                      <select
+                        name="category"
+                        value={newItem.category}
+                        onChange={handleInputChange}
+                        className="w-full p-2 border border-gray-300 outline-none rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      >
+                        {categories.map(category => (
+                          <option key={category} value={category}>{category}</option>
+                        ))}
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Unit*</label>
+                      <select
+                        name="unit"
+                        value={newItem.unit}
+                        onChange={handleInputChange}
+                        className="w-full p-2 border border-gray-300 outline-none rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      >
+                        <option value="pieces">Pieces</option>
+                        <option value="liters">Liters</option>
+                        <option value="kg">Kilograms</option>
+                        <option value="boxes">Boxes</option>
+                        <option value="units">Units</option>
+                      </select>
+                    </div>
                   </div>
 
-                  {/* Current Stock Field */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Current Stock*</label>
-                    <input
-                      type="number"
-                      name="currentStock"
-                      min="0"
-                      value={newItem.currentStock}
-                      onChange={handleInputChange}
-                      className={`w-full p-2 border rounded-md ${formErrors.currentStock ? 'border-red-500' : 'border-gray-300'}`}
-                    />
-                    {formErrors.currentStock && <p className="text-red-500 text-xs mt-1">{formErrors.currentStock}</p>}
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Current Stock*</label>
+                      <input
+                        type="number"
+                        name="currentStock"
+                        min="0"
+                        value={newItem.currentStock}
+                        onChange={handleInputChange}
+                        className={`w-full p-2 border outline-none rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                          formErrors.currentStock ? 'border-red-500' : 'border-gray-300'
+                        }`}
+                      />
+                      {formErrors.currentStock && <p className="text-red-500 text-xs mt-1">{formErrors.currentStock}</p>}
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Reorder Level*</label>
+                      <input
+                        type="number"
+                        name="reorderLevel"
+                        min="1"
+                        value={newItem.reorderLevel}
+                        onChange={handleInputChange}
+                        className={`w-full p-2 border outline-none rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                          formErrors.reorderLevel ? 'border-red-500' : 'border-gray-300'
+                        }`}
+                      />
+                      {formErrors.reorderLevel && <p className="text-red-500 text-xs mt-1">{formErrors.reorderLevel}</p>}
+                    </div>
                   </div>
 
-                  {/* Reorder Level Field */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Reorder Level*</label>
-                    <input
-                      type="number"
-                      name="reorderLevel"
-                      min="1"
-                      value={newItem.reorderLevel}
-                      onChange={handleInputChange}
-                      className={`w-full p-2 border rounded-md ${formErrors.reorderLevel ? 'border-red-500' : 'border-gray-300'}`}
-                    />
-                    {formErrors.reorderLevel && <p className="text-red-500 text-xs mt-1">{formErrors.reorderLevel}</p>}
-                  </div>
-
-                  {/* Unit Field */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Unit*</label>
-                    <select
-                      name="unit"
-                      value={newItem.unit}
-                      onChange={handleInputChange}
-                      className="w-full p-2 border border-gray-300 rounded-md"
-                    >
-                      <option value="pieces">Pieces</option>
-                      <option value="liters">Liters</option>
-                      <option value="kg">Kilograms</option>
-                      <option value="boxes">Boxes</option>
-                      <option value="units">Units</option>
-                    </select>
-                  </div>
-
-                  {/* Supplier Field (optional) */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Supplier</label>
                     <select
                       name="supplier"
                       value={newItem.supplier}
                       onChange={handleInputChange}
-                      className="w-full p-2 border border-gray-300 rounded-md"
+                      className="w-full p-2 border border-gray-300 outline-none rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     >
                       <option value="">Select Supplier</option>
                       {suppliers.map(supplier => (
@@ -613,20 +640,20 @@ const AdminInventoryDashboard = () => {
                   </div>
                 </div>
 
-                <div className="mt-6 flex justify-end space-x-3">
+                <div className="mt-6 flex justify-end gap-3">
                   <button
                     type="button"
                     onClick={() => {
                       setShowAddItemModal(false);
                       setFormErrors({});
                     }}
-                    className="px-4 py-2 bg-gray-200 rounded-md"
+                    className="px-4 py-2 bg-gray-200 rounded-md hover:bg-gray-300 transition"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                    className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
                   >
                     Add Item
                   </button>

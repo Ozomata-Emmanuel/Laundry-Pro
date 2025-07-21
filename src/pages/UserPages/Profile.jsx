@@ -27,26 +27,27 @@ import { toast } from "react-toastify";
 import Select from "react-select";
 
 const Profile = () => {
-  const { user } = useContext(DataContext);
+  const { users } = useContext(DataContext);
   const [orders, setOrders] = useState([]);
   const [branches, setBranches] = useState([]);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const printFrameRef = useRef(null);
   const [activeTab, setActiveTab] = useState("orders");
   const [showPasswordFields, setShowPasswordFields] = useState(false);
+  const customerUser = users.customer;
   const [formData, setFormData] = useState({
-    first_name: user.first_name,
-    last_name: user.last_name,
-    email: user.email,
-    phone: user.phone,
-    branch: user.branch,
+    first_name: customerUser?.first_name,
+    last_name: customerUser?.last_name,
+    email: customerUser?.email,
+    phone: customerUser?.phone,
+    branch: customerUser?.branch,
     password: "",
     newPassword: "",
     confirmPassword: "",
   });
   const [loading, setLoading] = useState(true);
   const receiptRef = useRef(null);
-  const userID = user?.id;
+  const userID = customerUser?.id;
   const branchOptions = [];
 
   useEffect(() => {
@@ -220,7 +221,7 @@ const Profile = () => {
     printWindow.document.close();
   };
 
-  const selectedBranch = branches.find((b) => b._id === user.branch);
+  const selectedBranch = branches.find((b) => b._id === customerUser.branch);
 
   if (loading) {
     return (
@@ -373,10 +374,16 @@ const Profile = () => {
                               {item.quantity}
                             </td>
                             <td className="py-3 px-4 text-right text-gray-600">
-                              ₦{item.price.toFixed(2)}
+                              ₦{item.price.toLocaleString("en-US", {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          })}
                             </td>
                             <td className="py-3 px-4 text-right text-gray-800 font-medium">
-                              ₦{(item.price * item.quantity).toFixed(2)}
+                              ₦{(item.price * item.quantity).toLocaleString("en-US", {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          })}
                             </td>
                           </tr>
                         ))}
@@ -390,7 +397,10 @@ const Profile = () => {
                     <div className="flex justify-between w-64">
                       <span className="text-gray-600">Subtotal:</span>
                       <span className="font-medium">
-                        ₦{selectedOrder.total_price.toFixed(2)}
+                        ₦{selectedOrder.total_price.toLocaleString("en-US", {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          })}
                       </span>
                     </div>
                     <div className="flex justify-between w-64 border-t-2 border-gray-300 pt-3">
@@ -398,7 +408,10 @@ const Profile = () => {
                         Total:
                       </span>
                       <span className="text-lg font-bold text-indigo-800">
-                        ₦{selectedOrder.total_price.toFixed(2)}
+                        ₦{selectedOrder.total_price.toLocaleString("en-US", {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          })}
                       </span>
                     </div>
                   </div>
@@ -429,7 +442,7 @@ const Profile = () => {
             <h1 className="text-3xl font-bold text-indigo-900">My Dashboard</h1>
             <p className="text-indigo-600 mt-2 flex items-center">
               <span>Welcome back, </span>
-              <span className="font-medium ml-1">{user.first_name}</span>
+              <span className="font-medium ml-1">{customerUser.first_name}</span>
               <span className="ml-2 flex items-center">
                 <MemberBadge points={orders.length * 20} />
               </span>
@@ -485,16 +498,16 @@ const Profile = () => {
               <div className="p-6 border-b border-indigo-100 bg-gradient-to-r from-indigo-50 to-blue-50">
                 <div className="flex items-center space-x-4">
                   <div className="w-16 h-16 rounded-full bg-gradient-to-r from-indigo-600 to-blue-600 flex items-center justify-center text-white text-2xl font-bold shadow-md">
-                    {user.first_name.charAt(0)}
-                    {user.last_name.charAt(0)}
+                    {customerUser.first_name.charAt(0)}
+                    {customerUser.last_name.charAt(0)}
                   </div>
                   <div>
                     <h3 className="font-medium text-indigo-900">
-                      {user.first_name} {user.last_name}
+                      {customerUser.first_name} {customerUser.last_name}
                     </h3>
                     <p className="text-sm text-indigo-500 mt-1">
                       Member since{" "}
-                      {new Date(user.createdAt).toLocaleDateString("en-US", {
+                      {new Date(customerUser.createdAt).toLocaleDateString("en-US", {
                         year: "numeric",
                         month: "long",
                       })}
@@ -684,7 +697,10 @@ const Profile = () => {
                                 </span>
                               </td>
                               <td className="px-6 py-4 whitespace-nowrap text-sm text-indigo-800 text-right font-medium">
-                                ₦{order.total_price.toFixed(2)}
+                                ₦{order.total_price.toLocaleString("en-US", {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          })}
                               </td>
                               <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                 <button

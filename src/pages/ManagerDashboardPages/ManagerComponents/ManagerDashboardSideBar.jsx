@@ -11,7 +11,9 @@ import {
   FiTrendingUp,
   FiClipboard,
 } from "react-icons/fi";
-import { FaCodeBranch } from "react-icons/fa";
+import { MdOutlineMarkEmailUnread } from "react-icons/md";
+import { RiInboxUnarchiveLine } from "react-icons/ri";
+
 import { toast } from "react-toastify";
 
 const ManagerDashboardSideBar = () => {
@@ -37,7 +39,7 @@ const ManagerDashboardSideBar = () => {
     {
       path: "/manager-dashboard/manage-requests",
       name: "Employees Requests",
-      icon: <FiUsers className="h-5 w-5" />,
+      icon: <RiInboxUnarchiveLine className="h-5 w-5" />,
     },
     // {
     // path: "/manager-dashboard/inventory",

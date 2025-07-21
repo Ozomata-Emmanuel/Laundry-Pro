@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
+import { FaInfoCircle } from 'react-icons/fa';
 import axios from 'axios';
 import { DataContext } from '../../context/DataContext';
 import { 
@@ -14,19 +15,22 @@ import {
 } from 'react-icons/fa';
 
 const EmployeeDashboardOrder = () => {
-  const { user } = useContext(DataContext);
+  const { users } = useContext(DataContext);
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [updatingStatus, setUpdatingStatus] = useState(null);
+  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const employeeUser = users.employee;
 
   useEffect(() => {
-    if (user?.id) {
-      fetchAssignedOrders(user.id);
+    if (employeeUser?.id) {
+      fetchAssignedOrders(employeeUser.id);
     }
-  }, [user]);
+  }, [employeeUser]);
 
   const fetchAssignedOrders = async (employeeId) => {
     const EmployeeToken = localStorage.getItem("EmployeeToken");
@@ -44,6 +48,11 @@ const EmployeeDashboardOrder = () => {
       setError('Failed to fetch assigned orders');
       setLoading(false);
     }
+  };
+
+  const handleOrderClick = (order) => {
+    setSelectedOrder(order);
+    setIsModalOpen(true);
   };
 
   const handleUpdateStatus = async (orderId, newStatus) => {
@@ -158,7 +167,7 @@ const EmployeeDashboardOrder = () => {
             <tbody className="bg-white divide-y divide-gray-200">
               {filteredOrders.length > 0 ? (
                 filteredOrders.map((order) => (
-                  <tr key={order._id} className="hover:bg-gray-50">
+                  <tr key={order._id} className="hover:bg-gray-50 cursor-pointer" onClick={() => handleOrderClick(order)}>
                     <td className="px-3 py-4 whitespace-nowrap">
                       <span className="text-blue-600 font-medium">#{order._id.slice(-6).toUpperCase()}</span>
                     </td>
@@ -172,7 +181,10 @@ const EmployeeDashboardOrder = () => {
                       </div>
                     </td>
                     <td className="px-3 py-4 whitespace-nowrap">
-                      ₦{order.total_price.toFixed(2)}
+                      ₦{order.total_price.toLocaleString("en-US", {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          })}
                     </td>
                     <td className="px-3 py-4 whitespace-nowrap">
                       {formatDate(order.updatedAt)}
@@ -259,6 +271,48 @@ const EmployeeDashboardOrder = () => {
           </div>
         </div>
       </div>
+      {selectedOrder && (
+  <div className={`fixed inset-0 bg-[#040013ea] z-50 flex items-center justify-center p-4 ${isModalOpen ? "block" : "hidden"}`}>
+    <div className="bg-white rounded-lg shadow-xl w-full max-w-md">
+      <div className="flex justify-between items-center border-b p-4">
+        <h3 className="text-lg font-semibold">
+          Order #{selectedOrder._id.slice(-6).toUpperCase()}
+        </h3>
+        <button 
+          onClick={() => setIsModalOpen(false)}
+          className="text-gray-500 hover:text-gray-700"
+        >
+          <FaTimes />
+        </button>
+      </div>
+      
+      <div className="p-4">
+        {selectedOrder.special_requests ? (
+          <>
+            <div className="flex items-center mb-3">
+              <FaInfoCircle className="text-yellow-500 mr-2" />
+              <h4 className="font-medium">Special Requests</h4>
+            </div>
+            <div className="bg-gray-50 p-3 rounded border border-gray-200">
+              <p className="whitespace-pre-line">{selectedOrder.special_requests}</p>
+            </div>
+          </>
+        ) : (
+          <p className="text-gray-500">No special requests for this order</p>
+        )}
+      </div>
+      
+      <div className="border-t p-4 flex justify-end">
+        <button
+          onClick={() => setIsModalOpen(false)}
+          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+        >
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+)}
     </div>
   );
 };

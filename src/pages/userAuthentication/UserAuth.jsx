@@ -7,7 +7,7 @@ import axios from "axios";
 import { DataContext } from "../../context/DataContext";
 
 const UserAuth = () => {
-  const { user, setUser, getUser } = useContext(DataContext);
+  const { user, setUsers, getUser } = useContext(DataContext);
   const navigate = useNavigate();
   const [branches, setBranches] = useState([]);
   const branchOptions = [];
@@ -39,16 +39,16 @@ const UserAuth = () => {
     }));
   };
 
-  if (localStorage.getItem("laundry_user_id")) {
-    const isUserLoggedIn = localStorage.getItem("laundry_user_id");
+  if (localStorage.getItem("laundry_customer_id")) {
+    const isUserLoggedIn = localStorage.getItem("laundry_customer_id");
   } 
   if (localStorage.getItem("laundry_admin_id")) {
     const isAdminLoggedIn = localStorage.getItem("laundry_admin_id");
   } 
-  if (localStorage.getItem("laundry_user_id")) {
+  if (localStorage.getItem("laundry_manager_id")) {
     const isManagerLoggedIn = localStorage.getItem("laundry_manager_id");
   } 
-  if (localStorage.getItem("laundry_user_id")) {
+  if (localStorage.getItem("laundry_employee_id")) {
     const isEmployeeLoggedIn = localStorage.getItem("laundry_employee_id");
   } 
   if (localStorage.getItem("laundry_supplier_id")){
@@ -216,7 +216,7 @@ const UserAuth = () => {
           localStorage.setItem("laundry_admin_id", resp.data.data.id);
           const token = resp.data.token;
           localStorage.setItem("AdminToken", token)
-          setUser(resp.data.data);
+          setUsers(resp.data.data);
           navigate("/admin-dashboard/overview");
           toast.success("Admin logged in successfully", {
             position: "top-right",
@@ -226,13 +226,13 @@ const UserAuth = () => {
             pauseOnHover: true,
             draggable: true,
           });
-          // window.location.reload()
+          window.location.reload()
         }
         if (resp.data.data.role === "customer") {
           localStorage.setItem("laundry_customer_id", resp.data.data.id);
           const token = resp.data.token;
           localStorage.setItem("CustomerToken", token)
-          setUser(resp.data.data);
+          setUsers(resp.data.data);
           navigate("/");
           toast.success("User Logged in successfully", {
             position: "top-right",
@@ -242,13 +242,13 @@ const UserAuth = () => {
             pauseOnHover: true,
             draggable: true,
           });
-          // window.location.reload()
+          window.location.reload()
         }
         if (resp.data.data.role === "supplier") {
           localStorage.setItem("laundry_supplier_id", resp.data.data.id);
           const token = resp.data.token;
           localStorage.setItem("SupplierToken", token)
-          setUser(resp.data.data);
+          setUsers(resp.data.data);
           navigate("/supplier-dashboard/overview");
           toast.success("User Logged in successfully", {
             position: "top-right",
@@ -258,14 +258,13 @@ const UserAuth = () => {
             pauseOnHover: true,
             draggable: true,
           });
-          // window.location.reload()
+          window.location.reload()
         }
         if (resp.data.data.role === "manager") {
           localStorage.setItem("laundry_manager_id", resp.data.data.id);
           const token = resp.data.token;
           localStorage.setItem("ManagerToken", token)
-          setUser(resp.data.data);
-          setUser(resp.data.data);
+          setUsers(resp.data.data);
           navigate("/manager-dashboard/overview");
           toast.success("User Logged in successfully", {
             position: "top-right",
@@ -275,14 +274,13 @@ const UserAuth = () => {
             pauseOnHover: true,
             draggable: true,
           });
-          // window.location.reload()
+          window.location.reload()
         }
         if (resp.data.data.role === "employee") {
           localStorage.setItem("laundry_employee_id", resp.data.data.id);
           const token = resp.data.token;
           localStorage.setItem("EmployeeToken", token)
-          setUser(resp.data.data);
-          setUser(resp.data.data);
+          setUsers(resp.data.data);
           navigate("/employee-dashboard/overview");
           toast.success("Employee Logged in successfully", {
             position: "top-right",
@@ -292,12 +290,12 @@ const UserAuth = () => {
             pauseOnHover: true,
             draggable: true,
           });
-          // window.location.reload()
+          window.location.reload()
         }
       } else {
         console.log(resp.data);
         toast.error(
-          resp?.data?.message || "An error occiiiiiiiiured while logging in",
+          resp?.data?.message || "An error occured while logging in",
           {
             position: "top-right",
             autoClose: 2000,
@@ -316,7 +314,7 @@ const UserAuth = () => {
       console.log(error);
       localStorage.setItem("error", error)
       toast.error(
-        error?.response?.data?.message || "An error ;oehr[oih[oiwh[oi]]] while logging in",
+        error?.response?.data?.message || "An error occured while logging in",
         {
           position: "top-right",
           autoClose: 2000,

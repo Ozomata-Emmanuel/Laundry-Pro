@@ -13,16 +13,17 @@ import {
 } from 'react-icons/fa';
 
 const EmployeeDashboardOverview = () => {
-  const { user } = useContext(DataContext);
+  const { users } = useContext(DataContext);
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const employeeUser = users.employee;
 
   useEffect(() => {
-    if (user?.id) {
-      fetchEmployeeOrders(user.id);
+    if (employeeUser?.id) {
+      fetchEmployeeOrders(employeeUser.id);
     }
-  }, [user]);
+  }, [employeeUser]);
 
   const fetchEmployeeOrders = async (employeeId) => {
     const EmployeeToken = localStorage.getItem("EmployeeToken");
@@ -185,7 +186,10 @@ const EmployeeDashboardOverview = () => {
                       {order.items.reduce((acc, item) => acc + item.quantity, 0)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      ₦{order.total_price.toFixed(2)}
+                      ₦{order.total_price.toLocaleString("en-US", {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          })}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`px-3 py-1 rounded-full text-xs font-medium ${
