@@ -145,7 +145,7 @@ const Profile = () => {
     e.preventDefault();
     try {
       const res = await axios.put(
-        `http://localhost:5002/laundry/api/user/${customerUser.id}`,
+        `http://localhost:5002/laundry/api/user-update/${customerUser.id}`,
         {
           first_name: formData.first_name,
           last_name: formData.last_name,
