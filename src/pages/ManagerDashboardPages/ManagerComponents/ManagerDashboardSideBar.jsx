@@ -12,6 +12,7 @@ import {
   FiClipboard,
 } from "react-icons/fi";
 import { MdOutlineMarkEmailUnread } from "react-icons/md";
+import { BsExclamationOctagon } from "react-icons/bs";
 import { RiInboxUnarchiveLine } from "react-icons/ri";
 
 import { toast } from "react-toastify";
@@ -41,11 +42,11 @@ const ManagerDashboardSideBar = () => {
       name: "Employees Requests",
       icon: <RiInboxUnarchiveLine className="h-5 w-5" />,
     },
-    // {
-    // path: "/manager-dashboard/inventory",
-    // name: "Inventory",
-    //   icon: <FiPackage className="h-5 w-5" />,
-    // },
+    {
+    path: "/manager-dashboard/order-issues",
+    name: "Issues",
+      icon: <BsExclamationOctagon className="h-5 w-5" />,
+    },
     // {
     //   path: "/manager-dashboard/reports",
     //   name: "Reports",

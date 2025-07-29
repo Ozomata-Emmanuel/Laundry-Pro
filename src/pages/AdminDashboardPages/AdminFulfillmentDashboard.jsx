@@ -150,7 +150,7 @@ const AdminFulfillmentDashboard = () => {
             <input
               type="text"
               placeholder="Search requests..."
-              className="pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full"
+              className="pl-10 pr-4 py-2 border outline-none border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && fetchRequests()}
@@ -163,7 +163,7 @@ const AdminFulfillmentDashboard = () => {
             <select
               value={filter}
               onChange={(e) => setFilter(e.target.value)}
-              className="pl-10 pr-4 py-2 border border-gray-300 rounded-md appearance-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full"
+              className="pl-10 pr-4 py-2 border outline-none border-gray-300 rounded-md appearance-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full"
             >
               <option value="all">All Requests</option>
               <option value="approved">Approved Only</option>
@@ -293,7 +293,7 @@ const AdminFulfillmentDashboard = () => {
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 h-fit sticky top-6">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 h-fit sticky top-20">
           <div className="p-6">
             <h2 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
               <FaInfoCircle className="text-blue-500" />

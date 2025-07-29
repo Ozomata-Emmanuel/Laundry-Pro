@@ -21,8 +21,6 @@ const EmployeeDashboardHeader = () => {
           },
         }
       );
-
-      console.log(res);
       if (res.data.success) {
         setBranch(res.data.data);
       }

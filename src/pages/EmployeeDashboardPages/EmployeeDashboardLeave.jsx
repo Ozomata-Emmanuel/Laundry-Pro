@@ -70,7 +70,7 @@ const EmployeeDashboardLeave = () => {
         "http://localhost:5002/laundry/api/leave/apply",
         {
           ...newLeave,
-          employeeId: user.id,
+          employeeId: employeeId,
         },
         {
           headers: {

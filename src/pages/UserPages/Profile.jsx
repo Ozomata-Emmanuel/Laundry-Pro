@@ -145,7 +145,7 @@ const Profile = () => {
     e.preventDefault();
     try {
       const res = await axios.put(
-        `http://localhost:5002/laundry/api/user/${user.id}`,
+        `http://localhost:5002/laundry/api/user/${customerUser.id}`,
         {
           first_name: formData.first_name,
           last_name: formData.last_name,
@@ -256,7 +256,7 @@ const Profile = () => {
               <PrintableReceipt
                 ref={printFrameRef}
                 order={selectedOrder}
-                user={user}
+                user={customerUser}
                 branch={selectedBranch}
               />
             </div>
@@ -305,13 +305,13 @@ const Profile = () => {
                     </h3>
                     <div className="space-y-2">
                       <p className="text-gray-800 font-medium">
-                        {user.first_name} {user.last_name}
+                        {customerUser.first_name} {customerUser.last_name}
                       </p>
                       <p className="text-gray-600 flex items-center">
-                        <FaPhone className="mr-2 text-sm" /> {user.phone}
+                        <FaPhone className="mr-2 text-sm" /> {customerUser.phone}
                       </p>
                       <p className="text-gray-600 flex items-center">
-                        <FaEnvelope className="mr-2 text-sm" /> {user.email}
+                        <FaEnvelope className="mr-2 text-sm" /> {customerUser.email}
                       </p>
                     </div>
                   </div>

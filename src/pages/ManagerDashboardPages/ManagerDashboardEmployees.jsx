@@ -17,7 +17,6 @@ const ManagerDashboardEmployees = () => {
   const [error, setError] = useState(null);
   const [selectedEmployee, setSelectedEmployee] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [employeeOrders, setEmployeeOrders] = useState([]);
   const [ordersLoading, setOrdersLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -43,7 +42,6 @@ const ManagerDashboardEmployees = () => {
           },
         }
       );
-      console.log(res);
       setEmployees(res.data.data);
       setLoading(false);
     } catch (err) {
@@ -73,26 +71,6 @@ const ManagerDashboardEmployees = () => {
     }
   };
 
-  const handleDeleteEmployee = async () => {
-    const ManagerToken = localStorage.getItem("ManagerToken");
-    try {
-      setLoading(true);
-      await axios.delete(
-        `http://localhost:5002/laundry/api/deleteUser/${selectedEmployee._id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${ManagerToken}`,
-          },
-        }
-      );
-      fetchEmployees(user.branch);
-      setIsDeleteModalOpen(false);
-      setLoading(false);
-    } catch (err) {
-      setError("Failed to delete employee");
-      setLoading(false);
-    }
-  };
 
   const openEmployeeDetails = (employee) => {
     setSelectedEmployee(employee);
@@ -233,15 +211,6 @@ const ManagerDashboardEmployees = () => {
                         >
                           View Details
                         </button>
-                        <button
-                          onClick={() => {
-                            setSelectedEmployee(employee);
-                            setIsDeleteModalOpen(true);
-                          }}
-                          className="text-red-600 hover:text-red-800 p-1 rounded-full hover:bg-red-50"
-                        >
-                          <FaTrash />
-                        </button>
                       </div>
                     </td>
                   </tr>
@@ -279,7 +248,7 @@ const ManagerDashboardEmployees = () => {
               </button>
             </div>
 
-            <div className="p-6 space-y-6">
+            <div className="p-6 space-y-6 relative">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="bg-gray-50 p-5 rounded-lg border border-gray-200">
                   <h3 className="font-semibold text-lg mb-4 flex items-center text-gray-700">
@@ -462,49 +431,12 @@ const ManagerDashboardEmployees = () => {
                 )}
               </div>
 
-              <div className="flex justify-end pt-4 border-t border-gray-200">
+              <div className="flex w-full bottom-20 bg-white justify-end pt-4 border-t border-gray-200">
                 <button
                   onClick={() => setIsModalOpen(false)}
                   className="px-6 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors"
                 >
                   Close
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {isDeleteModalOpen && selectedEmployee && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl shadow-2xl w-full max-w-md">
-            <div className="p-6">
-              <h2 className="text-xl font-bold text-gray-800 mb-4">
-                Confirm Deletion
-              </h2>
-              <p className="mb-4">
-                Are you sure you want to delete {selectedEmployee.first_name}{" "}
-                {selectedEmployee.last_name}?
-              </p>
-              <p className="text-red-600 mb-6">This action cannot be undone.</p>
-
-              <div className="flex justify-end space-x-3">
-                <button
-                  onClick={() => setIsDeleteModalOpen(false)}
-                  className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleDeleteEmployee}
-                  className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
-                  disabled={loading}
-                >
-                  {loading ? (
-                    <FaSpinner className="animate-spin inline-block" />
-                  ) : (
-                    "Delete"
-                  )}
                 </button>
               </div>
             </div>

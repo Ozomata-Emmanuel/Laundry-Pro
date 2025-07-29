@@ -34,7 +34,7 @@ const Order = () => {
   const stripePromise = loadStripe(
     "pk_test_51RltiPDGBYwV6nw0hSgQVVvN4vfeF69AL6LblPpfqGNo8Um3AGeOXTKnA1ayWJrBtf8iPAAX6dA9tjASsaEYZhUt00jvwlloka"
   );
-  const { user } = useContext(DataContext);
+  const { users } = useContext(DataContext);
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
@@ -141,6 +141,7 @@ const Order = () => {
   const [specialRequests, setSpecialRequests] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("card");
   const [orderNotes, setOrderNotes] = useState("");
+  const customerUser = users.customer;
 
   const calculateTotal = () => {
     return services.reduce((total, service) => {
@@ -187,8 +188,8 @@ const Order = () => {
     setLoading(true);
 
     const orderData = {
-      branch_id: user.branch,
-      user_id: user.id,
+      branch_id: customerUser.branch,
+      user_id: customerUser.id,
       items: services
         .filter((s) => s.selected)
         .map((item) => ({
@@ -761,8 +762,8 @@ const Order = () => {
                       <StripePaymentForm
                         total={calculateTotal()}
                         orderData={{
-                          branch_id: user.branch,
-                          user_id: user.id,
+                          branch_id: customerUser.branch,
+                          user_id: customerUser.id,
                           items: services
                             .filter((s) => s.selected)
                             .map((item) => ({

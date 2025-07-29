@@ -170,16 +170,18 @@ const ManagerDashboardOrders = () => {
           },
         }
       );
-      fetchOrders(user.branch);
+      fetchOrders(managerUser.branch);
       setAssignLoading(false);
     } catch (err) {
       setError("Failed to assign employee");
+      console.log(err)
       setAssignLoading(false);
     }
   };
 
   const openOrderDetails = (order) => {
     setSelectedOrder(order);
+    console.log(order)
     setIsModalOpen(true);
   };
 

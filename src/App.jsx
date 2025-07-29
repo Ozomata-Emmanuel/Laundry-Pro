@@ -54,6 +54,7 @@ import NotAuthorized from './components/NotAuthorized';
 import PrivacyPolicy from './components/PrivacyPolicy';
 import TermsOfService from './components/TermsOfService';
 import AdminFulfillmentDashboard from './pages/AdminDashboardPages/AdminFulfillmentDashboard';
+import ManagerDashboardIssues from './pages/ManagerDashboardPages/ManagerDashboardIssues';
 
 function App() {
   const location = useLocation();
@@ -122,6 +123,7 @@ function App() {
             <Route path="orders" element={<ManagerDashboardOrders />} />
             <Route path="reports" element={<ManagerDashboardReports />} />
             <Route path="manage-requests" element={<ManagerDashboardApproveRequest />} />
+            <Route path="order-issues" element={<ManagerDashboardIssues />} />
           </Route>
         </Route>
 
