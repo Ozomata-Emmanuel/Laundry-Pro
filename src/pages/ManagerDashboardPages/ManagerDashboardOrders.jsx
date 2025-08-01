@@ -462,7 +462,7 @@ const ManagerDashboardOrders = () => {
           }`}
         >
           <div className="bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
-            <div className="sticky top-0 bg-white z-10 border-b p-6">
+            <div className="sticky top-0 bg-white z-10 border-b border-gray-200 p-6">
               <div className="flex justify-between items-start">
                 <div>
                   <h2 className="text-2xl font-bold text-gray-800">

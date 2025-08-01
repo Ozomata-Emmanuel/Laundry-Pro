@@ -25,13 +25,12 @@ const AdminDashboardSideBar = () => {
     { path: "/admin-dashboard/overview", name: "Overview", icon: <FiHome className="h-5 w-5" /> },
     { path: "/admin-dashboard/inventory", name: "Inventory", icon: <FiPackage className="h-5 w-5" /> },
     { path: "/admin-dashboard/order-management", name: "Orders", icon: <FiClipboard className="h-5 w-5" /> },
+    { path: "/admin-dashboard/manage-leaves", name: "Leave Req", icon: <FiClipboard className="h-5 w-5" /> },
     { path: "/admin-dashboard/manage-employees", name: "Employees", icon: <FiUsers className="h-5 w-5" /> },
     { path: "/admin-dashboard/manage-suppliers", name: "Suppliers", icon: <FiTruck className="h-5 w-5" /> },
     { path: "/admin-dashboard/manage-locations", name: "Branches", icon: <FaCodeBranch className="h-5 w-5" /> },
     { path: "/admin-dashboard/reports", name: "Reports", icon: <FiTrendingUp className="h-5 w-5" /> },
-    { path: "/admin-dashboard/employee-requests", name: "Employee Requests", icon: <RiInboxUnarchiveLine className="h-5 w-5" /> },
-    
-    // { path: "/admin-dashboard/settings", name: "Settings", icon: <FiSettings className="h-5 w-5" /> },
+    { path: "/admin-dashboard/employee-requests", name: "Employee Requests", icon: <RiInboxUnarchiveLine className="h-5 w-5" /> },    
   ];
 
 

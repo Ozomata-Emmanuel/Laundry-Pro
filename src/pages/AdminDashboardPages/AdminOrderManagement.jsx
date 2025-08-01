@@ -284,18 +284,12 @@ const AdminOrderManagement = () => {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Customer
                 </th>
-                {/* <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Branch
-                </th> */}
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Items
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Status
                 </th>
-                {/* <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Assignment Status
-                </th> */}
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Actions
                 </th>
@@ -318,12 +312,8 @@ const AdminOrderManagement = () => {
                         ? `${order.user.first_name} ${order.user.last_name}`
                         : "N/A"}
                     </td>
-                    {/* <td className="px-6 py-4 whitespace-nowrap">
-                      {order.branch?.branch_name || "N/A"}
-                    </td> */}
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center text-sm text-gray-500">
-                        {/* <FaShoppingBag className="mr-2 text-indigo-600" /> */}
                         {order.items.reduce(
                           (acc, item) => acc + item.quantity,
                           0

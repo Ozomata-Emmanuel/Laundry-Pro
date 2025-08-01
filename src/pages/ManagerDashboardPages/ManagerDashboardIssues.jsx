@@ -6,9 +6,8 @@ import {
   FaSpinner, 
   FaCheck, 
   FaClock,
-  FaTimes,
-  FaFilter,
-  FaSearch
+  FaSearch,
+  FaFilter
 } from 'react-icons/fa';
 import { DataContext } from '../../context/DataContext';
 
@@ -36,9 +35,7 @@ const ManagerDashboardIssues = () => {
         }
       });
       setIssues(response.data.data || []);
-      console.log(response.data.data)
     } catch (error) {
-      console.log(error)
       console.error('Error fetching issues:', error);
       toast.error('Failed to fetch issues');
       setIssues([]);
@@ -63,7 +60,7 @@ const ManagerDashboardIssues = () => {
       setIssues(issues.map(issue => 
         issue._id === issueId ? response.data.data : issue
       ));
-      toast.success('Issue status updated');
+      toast.success(`Issue marked as ${newStatus.replace('_', ' ')}`);
     } catch (error) {
       console.error('Error updating status:', error);
       toast.error('Failed to update status');
@@ -104,6 +101,17 @@ const ManagerDashboardIssues = () => {
         return <FaCheck className="text-green-500" />;
       default:
         return <FaExclamationTriangle className="text-gray-500" />;
+    }
+  };
+
+  const getAvailableActions = (currentStatus) => {
+    switch (currentStatus) {
+      case 'open':
+        return ['in_progress'];
+      case 'in_progress':
+        return ['resolved'];
+      default:
+        return [];
     }
   };
 
@@ -182,91 +190,81 @@ const ManagerDashboardIssues = () => {
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {filteredIssues.length > 0 ? (
-                filteredIssues.map((issue) => (
-                  <tr key={issue._id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-normal max-w-xs">
-                      <div className="flex items-start">
-                        <div className="flex-shrink-0 mt-1 mr-3">
-                          {getStatusIcon(issue.status)}
+                filteredIssues.map((issue) => {
+                  const availableActions = getAvailableActions(issue.status);
+                  
+                  return (
+                    <tr key={issue._id} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 whitespace-normal max-w-xs">
+                        <div className="flex items-start">
+                          <div className="flex-shrink-0 mt-1 mr-3">
+                            {getStatusIcon(issue.status)}
+                          </div>
+                          <div>
+                            <p className="text-gray-800">{issue.description}</p>
+                            <p className="text-xs text-gray-500 mt-1">
+                              Reported: {new Date(issue.createdAt).toLocaleString()}
+                            </p>
+                          </div>
                         </div>
-                        <div>
-                          <p className="text-gray-800">{issue.description}</p>
-                          <p className="text-xs text-gray-500 mt-1">
-                            Reported: {new Date(issue.createdAt).toLocaleString()}
-                          </p>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        {issue.reporter?.first_name} {issue.reporter?.last_name}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className="text-blue-600 font-medium">
+                          #{issue.order?._id.slice(-6).toUpperCase()}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusBadge(issue.status)}`}>
+                          {issue.status.replace('_', ' ')}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex space-x-2">
+                          {availableActions.includes('in_progress') && (
+                            <button
+                              onClick={() => handleStatusChange(issue._id, 'in_progress')}
+                              disabled={updatingStatus === issue._id}
+                              className={`px-3 py-1 rounded-lg text-xs ${
+                                updatingStatus === issue._id
+                                  ? 'bg-gray-200 text-gray-600'
+                                  : 'bg-yellow-100 text-yellow-800 hover:bg-yellow-200'
+                              }`}
+                            >
+                              {updatingStatus === issue._id ? (
+                                <FaSpinner className="animate-spin" />
+                              ) : (
+                                'Start Progress'
+                              )}
+                            </button>
+                          )}
+                          {availableActions.includes('resolved') && (
+                            <button
+                              onClick={() => handleStatusChange(issue._id, 'resolved')}
+                              disabled={updatingStatus === issue._id}
+                              className={`px-3 py-1 rounded-lg text-xs ${
+                                updatingStatus === issue._id
+                                  ? 'bg-gray-200 text-gray-600'
+                                  : 'bg-green-100 text-green-800 hover:bg-green-200'
+                              }`}
+                            >
+                              {updatingStatus === issue._id ? (
+                                <FaSpinner className="animate-spin" />
+                              ) : (
+                                'Mark Resolved'
+                              )}
+                            </button>
+                          )}
+                          {availableActions.length === 0 && (
+                            <span className="text-gray-400 text-xs">No actions available</span>
+                          )}
                         </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      {issue.reporter?.first_name} {issue.reporter?.last_name}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="text-blue-600 font-medium">
-                        #{issue.order?._id.slice(-6).toUpperCase()}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusBadge(issue.status)}`}>
-                        {issue.status.replace('_', ' ')}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex space-x-2">
-                        {issue.status !== 'open' && (
-                          <button
-                            onClick={() => handleStatusChange(issue._id, 'open')}
-                            disabled={updatingStatus === issue._id}
-                            className={`px-3 py-1 rounded-lg text-xs ${
-                              updatingStatus === issue._id
-                                ? 'bg-gray-200 text-gray-600'
-                                : 'bg-red-100 text-red-800 hover:bg-red-200'
-                            }`}
-                          >
-                            {updatingStatus === issue._id ? (
-                              <FaSpinner className="animate-spin" />
-                            ) : (
-                              'Reopen'
-                            )}
-                          </button>
-                        )}
-                        {issue.status !== 'in_progress' && (
-                          <button
-                            onClick={() => handleStatusChange(issue._id, 'in_progress')}
-                            disabled={updatingStatus === issue._id}
-                            className={`px-3 py-1 rounded-lg text-xs ${
-                              updatingStatus === issue._id
-                                ? 'bg-gray-200 text-gray-600'
-                                : 'bg-yellow-100 text-yellow-800 hover:bg-yellow-200'
-                            }`}
-                          >
-                            {updatingStatus === issue._id ? (
-                              <FaSpinner className="animate-spin" />
-                            ) : (
-                              'In Progress'
-                            )}
-                          </button>
-                        )}
-                        {issue.status !== 'resolved' && (
-                          <button
-                            onClick={() => handleStatusChange(issue._id, 'resolved')}
-                            disabled={updatingStatus === issue._id}
-                            className={`px-3 py-1 rounded-lg text-xs ${
-                              updatingStatus === issue._id
-                                ? 'bg-gray-200 text-gray-600'
-                                : 'bg-green-100 text-green-800 hover:bg-green-200'
-                            }`}
-                          >
-                            {updatingStatus === issue._id ? (
-                              <FaSpinner className="animate-spin" />
-                            ) : (
-                              'Resolve'
-                            )}
-                          </button>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                ))
+                      </td>
+                    </tr>
+                  );
+                })
               ) : (
                 <tr>
                   <td colSpan="5" className="px-6 py-8 text-center text-gray-500">

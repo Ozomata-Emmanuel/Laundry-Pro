@@ -55,6 +55,7 @@ import PrivacyPolicy from './components/PrivacyPolicy';
 import TermsOfService from './components/TermsOfService';
 import AdminFulfillmentDashboard from './pages/AdminDashboardPages/AdminFulfillmentDashboard';
 import ManagerDashboardIssues from './pages/ManagerDashboardPages/ManagerDashboardIssues';
+import AdminLeaveRequest from './pages/AdminDashboardPages/AdminLeaveRequest';
 
 function App() {
   const location = useLocation();
@@ -108,6 +109,7 @@ function App() {
             <Route path="manage-suppliers" element={<AdminManageSuppliers />} />
             <Route path="manage-employees" element={<AdminManageEmployees />} />
             <Route path="manage-locations" element={<LocationManagement />} />
+            <Route path="manage-leaves" element={<AdminLeaveRequest />} />
             <Route path="add-branch" element={<AddBranch />} />
             <Route path="reports" element={<AdminReports />} />
             <Route path="employee-requests" element={<AdminFulfillmentDashboard />} />

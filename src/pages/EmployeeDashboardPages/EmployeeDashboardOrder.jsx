@@ -98,7 +98,7 @@ const EmployeeDashboardOrder = () => {
           status: newStatus,
         }
       );
-      fetchAssignedOrders(user.id);
+      fetchAssignedOrders(employeeUser.id);
       setUpdatingStatus(null);
     } catch (err) {
       setError("Failed to update order status");
@@ -244,7 +244,7 @@ const EmployeeDashboardOrder = () => {
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody className="bg-white divide-y text-gray-500  divide-gray-200">
               {filteredOrders.length > 0 ? (
                 filteredOrders.map((order) => (
                   <tr
@@ -257,13 +257,13 @@ const EmployeeDashboardOrder = () => {
                         #{order._id.slice(-6).toUpperCase()}
                       </span>
                     </td>
-                    <td className="px-3 py-4 whitespace-nowrap">
+                    <td className="px-3 py-4 whitespace-nowrap text-gray-400">
                       {order.user?.first_name
                         ? `${order.user.first_name} ${order.user.last_name}`
                         : "N/A"}
                     </td>
                     <td className="px-3 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
+                      <div className="flex items-center font-semibold">
                         <FaShoppingBag className="mr-2 text-indigo-600" />
                         {order.items.reduce(
                           (acc, item) => acc + item.quantity,
@@ -279,7 +279,7 @@ const EmployeeDashboardOrder = () => {
                         maximumFractionDigits: 2,
                       })}
                     </td>
-                    <td className="px-3 py-4 whitespace-nowrap">
+                    <td className="px-3 py-4 whitespace-nowrap text-sm">
                       {formatDate(order.updatedAt)}
                     </td>
                     <td className="px-3 py-4 whitespace-nowrap">

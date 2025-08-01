@@ -251,7 +251,7 @@ const EmployeeDashboardInventory = () => {
                     <tr key={request._id} className="hover:bg-gray-50">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span className="text-blue-600 font-medium">
-                          {request.order?.order_number || `#${request.orderId?.slice(-6)?.toUpperCase()}`}
+                          #{request.order?._id.slice(-6)?.toUpperCase()}
                         </span>
                       </td>
                       <td className="px-6 py-4">
