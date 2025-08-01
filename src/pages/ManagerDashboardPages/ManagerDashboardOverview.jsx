@@ -32,7 +32,6 @@ const ManagerDashboardOverview = () => {
   const [error, setError] = useState(null);
   const managerUser = users.manager;
 
-  // Sample color palette
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
 
   useEffect(() => {
@@ -68,16 +67,13 @@ const fetchStats = async (branchId) => {
     const orders = ordersRes.data.data || [];
     const employees = employeesRes.data.data || [];
 
-    // Calculate additional metrics
     const paidOrders = orders.filter(o => o.is_paid);
     const unpaidOrders = orders.filter(o => !o.is_paid);
     
-    // Using pickup_date as due_date since your schema doesn't have due_date
     const overdueOrders = orders.filter(o => 
       o.pickup_date && new Date(o.pickup_date) < new Date() && o.status !== 'finished'
     ).length;
 
-    // Calculate average completion time using createdAt and updatedAt
     const completedOrders = orders.filter(o => o.status === 'finished');
     const totalCompletionTime = completedOrders.reduce((sum, order) => {
       if (order.updatedAt && order.createdAt) {
@@ -89,7 +85,6 @@ const fetchStats = async (branchId) => {
       ? totalCompletionTime / completedOrders.length 
       : 0;
 
-    // Get popular items (your schema uses 'items' not 'services')
     const itemCounts = {};
     orders.forEach(order => {
       if (order.items && Array.isArray(order.items)) {
@@ -112,8 +107,8 @@ const fetchStats = async (branchId) => {
       totalEmployees: employees.length,
       revenue: paidOrders.reduce((sum, order) => sum + (order.total_price || 0), 0),
       overdueOrders,
-      avgCompletionTime: avgCompletionTime / (1000 * 60 * 60), // Convert to hours
-      popularItems, // Changed from popularServices to popularItems
+      avgCompletionTime: avgCompletionTime / (1000 * 60 * 60),
+      popularItems, 
       statusData: [
         { name: 'Not Started', value: orders.filter(o => o.status === 'not_started').length },
         { name: 'Processing', value: orders.filter(o => o.status === 'processing').length },
@@ -123,7 +118,7 @@ const fetchStats = async (branchId) => {
         { name: 'Paid', value: paidOrders.length },
         { name: 'Unpaid', value: unpaidOrders.length }
       ],
-      deliveryStats: [ // New metric based on delivery_option
+      deliveryStats: [ 
         { name: 'Pickup', value: orders.filter(o => o.delivery_option === 'pickup').length },
         { name: 'Dropoff', value: orders.filter(o => o.delivery_option === 'dropoff').length }
       ]
@@ -157,9 +152,7 @@ const fetchStats = async (branchId) => {
     <div className="container mx-auto px-4 py-6">
       <h1 className="text-2xl font-bold text-gray-800 mb-6">Dashboard Overview</h1>
       
-      {/* Top Metrics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        {/* Total Orders */}
         <div className="bg-white p-6 rounded-lg shadow hover:shadow-md transition-shadow">
           <div className="flex items-center">
             <div className="p-3 rounded-full bg-blue-100 text-blue-600 mr-4">
@@ -173,7 +166,6 @@ const fetchStats = async (branchId) => {
           </div>
         </div>
 
-        {/* Pending Orders */}
         <div className="bg-white p-6 rounded-lg shadow hover:shadow-md transition-shadow">
           <div className="flex items-center">
             <div className="p-3 rounded-full bg-yellow-100 text-yellow-600 mr-4">
@@ -187,7 +179,6 @@ const fetchStats = async (branchId) => {
           </div>
         </div>
 
-        {/* Employees */}
         <div className="bg-white p-6 rounded-lg shadow hover:shadow-md transition-shadow">
           <div className="flex items-center">
             <div className="p-3 rounded-full bg-green-100 text-green-600 mr-4">
@@ -201,7 +192,6 @@ const fetchStats = async (branchId) => {
           </div>
         </div>
 
-        {/* Revenue */}
         <div className="bg-white p-6 rounded-lg shadow hover:shadow-md transition-shadow">
           <div className="flex items-center">
             <div className="p-3 rounded-full bg-purple-100 text-purple-600 mr-4">
@@ -221,9 +211,7 @@ const fetchStats = async (branchId) => {
         </div>
       </div>
 
-      {/* Second Row Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        {/* Completed Orders */}
         <div className="bg-white p-6 rounded-lg shadow hover:shadow-md transition-shadow">
           <div className="flex items-center">
             <div className="p-3 rounded-full bg-green-100 text-green-600 mr-4">
@@ -237,7 +225,6 @@ const fetchStats = async (branchId) => {
           </div>
         </div>
 
-        {/* Overdue Orders */}
         <div className="bg-white p-6 rounded-lg shadow hover:shadow-md transition-shadow">
           <div className="flex items-center">
             <div className="p-3 rounded-full bg-red-100 text-red-600 mr-4">
@@ -251,7 +238,6 @@ const fetchStats = async (branchId) => {
           </div>
         </div>
 
-        {/* Avg Completion Time */}
         <div className="bg-white p-6 rounded-lg shadow hover:shadow-md transition-shadow">
           <div className="flex items-center">
             <div className="p-3 rounded-full bg-blue-100 text-blue-600 mr-4">
@@ -265,8 +251,6 @@ const fetchStats = async (branchId) => {
           </div>
         </div>
 
-        {/* Popular Service */}
-{/* Top Items */}
 <div className="bg-white p-6 rounded-lg shadow hover:shadow-md transition-shadow">
   <h3 className="text-sm text-gray-500 mb-2">Top Items</h3>
   <div className="space-y-2">
@@ -286,10 +270,8 @@ const fetchStats = async (branchId) => {
 </div>
       </div>
 
-      {/* Charts Section */}
       
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-        {/* Orders by Status */}
         <div className="bg-white p-6 rounded-lg shadow">
           <h2 className="text-lg font-semibold mb-4">Orders by Status</h2>
           <div className="h-64">
@@ -306,7 +288,6 @@ const fetchStats = async (branchId) => {
           </div>
         </div>
 
-        {/* Payment Status */}
         <div className="bg-white p-6 rounded-lg shadow">
           <h2 className="text-lg font-semibold mb-4">Payment Status</h2>
           <div className="h-64">
@@ -336,7 +317,6 @@ const fetchStats = async (branchId) => {
         
       </div>
 
-      {/* Popular Services */}
 <div className="bg-white p-6 rounded-lg shadow mb-8">
   <h2 className="text-lg font-semibold mb-4">Top Items</h2>
   {stats.popularItems?.length > 0 ? (

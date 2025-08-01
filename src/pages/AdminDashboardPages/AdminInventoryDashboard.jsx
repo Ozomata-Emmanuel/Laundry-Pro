@@ -123,40 +123,39 @@ const AdminInventoryDashboard = () => {
     fetchData();
   }, []);
 
-  const handleRequestItems = async (items) => {
-    const AdminToken = localStorage.getItem("AdminToken");
-    try {
-      const response = await axios.post("http://localhost:5002/laundry/api/reorder/requests", {
-        supplier: selectedSupplierId,
-        items: items.map(item => ({
-          name: item.name,
-          category: item.category,
-          quantity: item.reorderLevel * 2 - item.currentStock,
-          unit: item.unit
-        }))
-      },
-        {
-          headers: {
-            Authorization: `Bearer ${AdminToken}`,
-          },
-        }
-      );
-      // /laundry/api/reorder/requests/:id/fulfill
+const handleRequestItems = async (items) => {
+  const AdminToken = localStorage.getItem("AdminToken");
+  try {
+    const response = await axios.post("http://localhost:5002/laundry/api/reorder/requests", {
+      supplier: selectedSupplierId,
+      items: items.map(item => ({
+        name: item.name,
+        category: item.category,
+        quantity: item.quantity,
+        unit: item.unit
+      }))
+    },
+      {
+        headers: {
+          Authorization: `Bearer ${AdminToken}`,
+        },
+      }
+    );
 
-      setShowRequestModal(false);
-      setSelectedItems([]);
-      setSelectedSupplierId('');
+    setShowRequestModal(false);
+    setSelectedItems([]);
+    setSelectedSupplierId('');
 
-      fetchInventoryData();
-      toast.success(`Inventory request sent`)
-    } catch (err) {
-      toast.error(`error sending inventory request`)
-      setError(err.response?.data?.message || 'Failed to submit reorder request');
-      console.log(err)
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    fetchInventoryData();
+    toast.success(`Inventory request sent`)
+  } catch (err) {
+    toast.error(`error sending inventory request`)
+    setError(err.response?.data?.message || 'Failed to submit reorder request');
+    console.log(err)
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   const fetchInventoryData = async () => {
     const AdminToken = localStorage.getItem("AdminToken");
@@ -426,9 +425,9 @@ const AdminInventoryDashboard = () => {
                     <button
                       className="text-sm bg-white text-red-600 px-3 py-1 rounded-md border border-red-200 hover:bg-red-100 transition"
                       onClick={() => {
-                        setSelectedItems([item]);
-                        setShowRequestModal(true);
-                      }}
+  setSelectedItems([{...item, quantity: item.reorderLevel * 2 - item.currentStock}]);
+  setShowRequestModal(true);
+}}
                     >
                       Reorder
                     </button>
@@ -463,69 +462,89 @@ const AdminInventoryDashboard = () => {
           </div>
         </div>
 
-        {showRequestModal && (
-          <div className="fixed inset-0 bg-[#07020fee] backdrop-blur-xs flex items-center justify-center p-4 z-50">
-            <div className="bg-white rounded-lg p-6 w-full max-w-md">
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-medium">Request Items</h3>
-                <button 
-                  onClick={() => setShowRequestModal(false)}
-                  className="text-gray-500 hover:text-gray-700"
-                >
-                  <FaTimes />
-                </button>
-              </div>
-              
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-1">Supplier</label>
-                <select 
-                  className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  value={selectedSupplierId}
-                  onChange={(e) => setSelectedSupplierId(e.target.value)}
-                >
-                  <option value="">Select Supplier</option>
-                  {suppliers.map(supplier => (
-                    <option key={supplier._id} value={supplier._id}>
-                      {supplier.companyName} ({supplier.contactPerson})
-                    </option>
-                  ))}
-                </select>
-              </div>
+{showRequestModal && (
+  <div className="fixed inset-0 bg-[#02000c59] backdrop-blur-xs flex items-center justify-center p-4 z-50">
+    <div className="bg-white rounded-lg p-6 w-full max-w-md">
+      <div className="flex justify-between items-center mb-4">
+        <h3 className="text-lg font-medium">Request Items</h3>
+        <button 
+          onClick={() => setShowRequestModal(false)}
+          className="text-gray-500 hover:text-gray-700"
+        >
+          <FaTimes />
+        </button>
+      </div>
+      
+      <div className="mb-4">
+        <label className="block text-sm font-medium text-gray-700 mb-1">Supplier</label>
+        <select 
+          className="w-full p-2 border-3 border-blue-500 rounded-md outline-none focus:ring-blue-500 focus:border-blue-500"
+          value={selectedSupplierId}
+          onChange={(e) => setSelectedSupplierId(e.target.value)}
+        >
+          <option value="">Select Supplier</option>
+          {suppliers.map(supplier => (
+            <option key={supplier._id} value={supplier._id}>
+              {supplier.companyName} ({supplier.contactPerson})
+            </option>
+          ))}
+        </select>
+      </div>
 
-              <div className="mb-4">
-                <h4 className="font-medium mb-2">Items to Order</h4>
-                <div className="bg-gray-50 p-3 rounded-md">
-                  {selectedItems.map(item => (
-                    <div key={item._id} className="flex justify-between py-2 border-b border-gray-200 last:border-0">
-                      <span>{item.name}</span>
-                      <span className="font-medium">
-                        {item.reorderLevel * 2 - item.currentStock} {item.unit}
-                      </span>
-                    </div>
-                  ))}
-                </div>
+      <div className="mb-4">
+        <h4 className="font-medium mb-2">Items to Order</h4>
+        <div className="bg-gray-50 p-3 rounded-md">
+          {selectedItems.map(item => (
+            <div key={item._id} className="flex flex-col py-2 border-b border-gray-200 last:border-0">
+              <div className="flex justify-between mb-1">
+                <span>{item.name}</span>
+                <span className="text-sm text-gray-500">{item.unit}</span>
               </div>
-
-              <div className="flex justify-end gap-3">
-                <button 
-                  className="px-4 py-2 bg-gray-200 rounded-md hover:bg-gray-300 transition"
-                  onClick={() => setShowRequestModal(false)}
-                >
-                  Cancel
-                </button>
-                <button 
-                  className={`px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition ${
-                    !selectedSupplierId ? 'opacity-50 cursor-not-allowed' : ''
-                  }`}
-                  onClick={() => handleRequestItems(selectedItems)}
-                  disabled={!selectedSupplierId}
-                >
-                  Submit Request
-                </button>
+              <div className="flex items-center gap-2">
+                <span className="text-sm">Quantity:</span>
+                <input
+                  type="number"
+                  min="1"
+                  value={item.quantity}
+                  onChange={(e) => {
+                    const newItems = [...selectedItems];
+                    const index = newItems.findIndex(i => i._id === item._id);
+                    if (index !== -1) {
+                      newItems[index].quantity = parseInt(e.target.value) || 0;
+                      setSelectedItems(newItems);
+                    }
+                  }}
+                  className="w-20 p-1 border outline-none border-gray-300 rounded-md"
+                />
+                <span className="text-sm text-gray-500">
+                  (Current: {item.currentStock}, Reorder at: {item.reorderLevel})
+                </span>
               </div>
             </div>
-          </div>
-        )}
+          ))}
+        </div>
+      </div>
+
+      <div className="flex justify-end gap-3">
+        <button 
+          className="px-4 py-2 bg-gray-200 rounded-md hover:bg-gray-300 transition"
+          onClick={() => setShowRequestModal(false)}
+        >
+          Cancel
+        </button>
+        <button 
+          className={`px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition ${
+            !selectedSupplierId ? 'opacity-50 cursor-not-allowed' : ''
+          }`}
+          onClick={() => handleRequestItems(selectedItems)}
+          disabled={!selectedSupplierId}
+        >
+          Submit Request
+        </button>
+      </div>
+    </div>
+  </div>
+)}
 
         {showAddItemModal && (
           <div className="fixed inset-0 bg-[#07020fee] backdrop-blur-xs flex items-center justify-center p-4 z-50">

@@ -548,7 +548,7 @@ const Order = () => {
                             type="date"
                             value={pickupDate}
                             onChange={(e) => setPickupDate(e.target.value)}
-                            className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+                            className="w-full p-3 border-3 border-blue-400 rounded-lg focus:border-blue-600 bg-white"
                             min={new Date().toISOString().split("T")[0]}
                             required
                           />
@@ -564,7 +564,7 @@ const Order = () => {
                             type="time"
                             value={pickupTime}
                             onChange={(e) => setPickupTime(e.target.value)}
-                            className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+                            className="w-full p-3 border-3 border-blue-400 rounded-lg focus:border-blue-600 bg-white"
                             required
                           />
                           <FaClock className="absolute right-3 top-3.5 text-indigo-400" />
@@ -582,7 +582,7 @@ const Order = () => {
                             type="date"
                             value={deliveryDate}
                             onChange={(e) => setDeliveryDate(e.target.value)}
-                            className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+                            className="w-full p-3 border-3 border-blue-400 rounded-lg focus:border-blue-600 bg-white"
                             min={
                               pickupDate ||
                               new Date().toISOString().split("T")[0]
@@ -601,7 +601,7 @@ const Order = () => {
                             type="time"
                             value={deliveryTime}
                             onChange={(e) => setDeliveryTime(e.target.value)}
-                            className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+                            className="w-full p-3 border-3 border-blue-400 rounded-lg focus:border-blue-600 bg-white"
                             required
                           />
                           <FaClock className="absolute right-3 top-3.5 text-indigo-400" />
@@ -617,7 +617,7 @@ const Order = () => {
                         type="text"
                         value={address}
                         onChange={(e) => setAddress(e.target.value)}
-                        className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+                        className="w-full outline-none p-3 border-3 border-blue-400 duration-200 rounded-lg focus:border-blue-600 bg-white"
                         placeholder="Enter your full address"
                         required
                       />
@@ -652,7 +652,7 @@ const Order = () => {
                   <textarea
                     value={specialRequests}
                     onChange={(e) => setSpecialRequests(e.target.value)}
-                    className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+                    className="w-full p-3 border-2 border-blue-500 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
                     rows="4"
                     placeholder="Any special care instructions for your items..."
                   />
@@ -686,7 +686,7 @@ const Order = () => {
                   Payment Method
                 </h3>
 
-                <div className="grid md:grid-cols-3 gap-4">
+                <div className="grid md:grid-cols-2 gap-4">
                   <div
                     className={`p-5 rounded-xl cursor-pointer transition-all border-2
                       ${
@@ -706,29 +706,6 @@ const Order = () => {
                         </h4>
                         <p className="text-sm text-indigo-600">
                           Visa, Mastercard, etc.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                  <div
-                    className={`p-5 rounded-xl cursor-pointer transition-all border-2
-                      ${
-                        paymentMethod === "paypal"
-                          ? "border-blue-500 bg-blue-50"
-                          : "border-gray-200 hover:border-blue-300 bg-white"
-                      }`}
-                    onClick={() => setPaymentMethod("paypal")}
-                  >
-                    <div className="flex items-center">
-                      <div className="p-3 rounded-lg bg-indigo-100 text-indigo-700 mr-4">
-                        <FaPaypal className="text-xl" />
-                      </div>
-                      <div>
-                        <h4 className="font-semibold text-indigo-900">
-                          PayPal
-                        </h4>
-                        <p className="text-sm text-indigo-600">
-                          Secure online payment
                         </p>
                       </div>
                     </div>
@@ -823,6 +800,7 @@ const Order = () => {
                         }}
                         onError={(error) => {
                           toast.error(error || "Payment failed");
+                          return
                         }}
                       />
                     </Elements>
@@ -838,7 +816,7 @@ const Order = () => {
                       <textarea
                         value={orderNotes}
                         onChange={(e) => setOrderNotes(e.target.value)}
-                        className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+                        className="w-full p-3 border-2 border-blue-500 outline-none rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
                         rows="4"
                         placeholder="Any additional notes for your order..."
                       />

@@ -23,9 +23,11 @@ const AdminReports = () => {
   const [activeTab, setActiveTab] = useState('financial');
   const [loading, setLoading] = useState(true);
   const [lastUpdated, setLastUpdated] = useState(new Date());
+  const [searchTerm, setSearchTerm] = useState("");
   const [orders, setOrders] = useState([]);
-  const [customers, setCustomers] = useState([]);
   const [timeRange, setTimeRange] = useState('7days');
+  const [customers, setCustomers] = useState([]);
+  const [filteredCustomers, setFilteredCustomers] = useState([]);
 
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('en-NG', { 
@@ -67,6 +69,7 @@ const AdminReports = () => {
       });
       if (response.data.success) {
         setCustomers(response.data.data);
+        setFilteredCustomers(response.data.data);
       } else {
         toast.error(response.data.message || "Failed to fetch customers");
       }
@@ -78,6 +81,24 @@ const AdminReports = () => {
       setLastUpdated(new Date());
     }
   };
+
+    useEffect(() => {
+    if (searchTerm.trim() === '') {
+      setFilteredCustomers(customers);
+    } else {
+      const filtered = customers.filter(customer => {
+        const searchLower = searchTerm.toLowerCase();
+        return (
+          customer._id.toLowerCase().includes(searchLower) ||
+          `${customer.first_name || ''} ${customer.last_name || ''}`.toLowerCase().includes(searchLower) ||
+          (customer.email && customer.email.toLowerCase().includes(searchLower)) ||
+          (customer.phone && customer.phone.toLowerCase().includes(searchLower))
+        );
+      });
+      setFilteredCustomers(filtered);
+    }
+  }, [searchTerm, customers]);
+
 
   useEffect(() => {
     fetchOrders();
@@ -633,74 +654,68 @@ const AdminReports = () => {
             <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
               <div className="flex justify-between items-center mb-4">
                 <h2 className="text-lg font-semibold text-gray-800">Customer List</h2>
-                <input 
-                  type="text" 
-                  placeholder="Search customers..." 
-                  className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
+                <input
+          type="text"
+          placeholder="Search customers..."
+          className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent w-full max-w-md"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
               </div>
-              <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contact</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Segment</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Orders</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Spent</th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    {customers.slice(0, 5).map((customer) => {
-                      const customerOrders = orders.filter(o => o.user_id === customer._id);
-                      const orderCount = customerOrders.length;
-                      const totalSpent = customerOrders.reduce((sum, order) => sum + order.total_price, 0);
-                      const segment = getCustomerSegment(customer);
-                      
-                      return (
-                        <tr key={customer._id} className="hover:bg-gray-50">
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="flex items-center">
-                              <div className="flex-shrink-0 h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center">
-                                <span className="text-gray-600 font-medium">
-                                  {customer.first_name?.[0]}{customer.last_name?.[0]}
-                                </span>
-                              </div>
-                              <div className="ml-4">
-                                <div className="font-medium text-gray-900">
-                                  {customer.first_name} {customer.last_name}
-                                </div>
-                                <div className="text-gray-500 text-sm">ID: #{customer._id.slice(-6).toUpperCase()}</div>
-                              </div>
-                            </div>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            <div>{customer.email}</div>
-                            <div>{customer.phone}</div>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <span 
-                              className={`px-2 py-1 text-xs font-medium rounded-full`}
-                              style={{
-                                backgroundColor: `${segmentColors[segment]}20`,
-                                color: segmentColors[segment]
-                              }}
-                            >
-                              {segment}
-                            </span>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            {orderCount}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                            {formatCurrency(totalSpent)}
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
+
+      {loading ? (
+        <div>Loading customers...</div>
+      ) : (
+        <div className="bg-white shadow rounded-lg overflow-hidden">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Customer
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Contact
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Customer ID
+                </th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {filteredCustomers.slice(0, 5).map((customer) => (
+                <tr key={customer._id} className="hover:bg-gray-50">
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="flex items-center">
+                      <div className="flex-shrink-0 h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center">
+                        <span className="text-gray-600 font-medium">
+                          {customer.first_name?.[0]}{customer.last_name?.[0]}
+                        </span>
+                      </div>
+                      <div className="ml-4">
+                        <div className="font-medium text-gray-900">
+                          {customer.first_name} {customer.last_name}
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <div>{customer.email}</div>
+                    <div>{customer.phone}</div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    #{customer._id.slice(-6).toUpperCase()}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          {filteredCustomers.length === 0 && (
+            <div className="p-4 text-center text-gray-500">
+              No customers found matching your search
+            </div>
+          )}
+        </div>
+      )}
             </div>
           </div>
         )}

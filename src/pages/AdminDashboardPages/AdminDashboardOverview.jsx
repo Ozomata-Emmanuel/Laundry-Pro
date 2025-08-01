@@ -191,7 +191,7 @@ const AdminDashboardOverview = () => {
   }, []);
 
   const getTrendIcon = (value, comparisonValue = 0) => {
-    if (value > comparisonValue) return <FaArrowUp className="inline ml-1" />;
+    // if (value > comparisonValue) return <FaArrowUp className="inline ml-1" />;
     if (value < comparisonValue) return <FaArrowDown className="inline ml-1" />;
     return null;
   };

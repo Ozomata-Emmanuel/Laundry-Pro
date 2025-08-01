@@ -7,11 +7,18 @@ const LocationManagement = () => {
   const [branches, setBranches] = useState([]);
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedBranch, setSelectedBranch] = useState(null);
+  const [branchDetails, setBranchDetails] = useState({
+    revenue: 0,
+    customers: [],
+    employees: [],
+    orders: []
+  });
+  const [modalLoading, setModalLoading] = useState(false);
 
   useEffect(() => {
     fetchBranches();
   }, []);
-
 
   const fetchBranches = async () => {
     try {
@@ -25,12 +32,50 @@ const LocationManagement = () => {
     }
   };
 
+  const fetchBranchDetails = async (branchId) => {
+    try {
+      const AdminToken = localStorage.getItem("AdminToken");
+      setModalLoading(true);
+      const config = {
+          headers: {
+            Authorization: `Bearer ${AdminToken}`,
+            "Content-Type": "application/json",
+          },
+        };
+      const [revenueRes, customersRes, employeesRes, ordersRes] = await Promise.all([
+        axios.get(`http://localhost:5002/laundry/api/orders/branch/revenue/${branchId}`),
+        axios.get(`http://localhost:5002/laundry/api/users/branch/${branchId}/customers`, config),
+        axios.get(`http://localhost:5002/laundry/api/users/branch/${branchId}/employees`, config),
+        axios.get(`http://localhost:5002/laundry/api/order/all/${branchId}`, config)
+      ]);
+
+      setBranchDetails({
+        revenue: revenueRes.data.data || 0,
+        customers: customersRes.data.data || [],
+        employees: employeesRes.data.data || [],
+        orders: ordersRes.data.data || []
+      });
+    } catch (error) {
+      toast.error('Failed to fetch branch details');
+    } finally {
+      setModalLoading(false);
+    }
+  };
+
+  const handleBranchClick = async (branch) => {
+    setSelectedBranch(branch);
+    await fetchBranchDetails(branch._id);
+  };
+
   const handleStatusToggle = async (branchId, currentStatus) => {
     const newStatus = currentStatus === 'active' ? 'inactive' : 'active';
     try {
-      await axios.patch(`/api/branches/${branchId}/status`, { status: newStatus });
+      await axios.patch(`http://localhost:5002/laundry/api/branch/${branchId}/status`, { status: newStatus });
       toast.success(`Branch ${newStatus === 'active' ? 'activated' : 'deactivated'}`);
       fetchBranches();
+      if (selectedBranch && selectedBranch._id === branchId) {
+        setSelectedBranch({ ...selectedBranch, status: newStatus });
+      }
     } catch (error) {
       toast.error('Failed to update branch status');
     }
@@ -42,10 +87,11 @@ const LocationManagement = () => {
     branch.branch_id.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const getStatusBadge = (status) => {
-    return status === 'active'
-      ? 'bg-green-100 text-green-800'
-      : 'bg-red-100 text-red-800';
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD'
+    }).format(amount);
   };
 
   return (
@@ -111,11 +157,15 @@ const LocationManagement = () => {
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
                     {filteredBranches.map((branch) => (
-                      <tr key={branch._id} className="hover:bg-indigo-50 transition-colors">
+                      <tr 
+                        key={branch._id} 
+                        className="hover:bg-indigo-50 transition-colors cursor-pointer"
+                        onClick={() => handleBranchClick(branch)}
+                      >
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">#Brach_{branch._id.slice(-4).toUpperCase()}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 font-medium">{branch.branch_name}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {branch.city}, {branch.state.slice(0,6)}...
+                          {branch.city}, {branch.state}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{branch.phone}</td>
                         <td className="px-6 py-4 whitespace-nowrap">
@@ -134,11 +184,15 @@ const LocationManagement = () => {
                             <Link
                               to={`/edit-branch/${branch._id}`}
                               className="text-indigo-600 hover:text-indigo-900"
+                              onClick={(e) => e.stopPropagation()}
                             >
                               Edit
                             </Link>
                             <button
-                              onClick={() => handleStatusToggle(branch._id, branch.status)}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleStatusToggle(branch._id, branch.status);
+                              }}
                               className={`${
                                 branch.status === 'active'
                                   ? 'text-red-600 hover:text-red-900'
@@ -158,6 +212,128 @@ const LocationManagement = () => {
           </div>
         </div>
       </div>
+
+      {/* Branch Details Modal */}
+      {selectedBranch && (
+        <div className="fixed inset-0 bg-black/10 backdrop-blur-xs flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex justify-between items-start mb-6">
+                <div>
+                  <h3 className="text-2xl font-bold text-indigo-900">{selectedBranch.branch_name}</h3>
+                  <p className="text-gray-600">
+                    {selectedBranch.address}, {selectedBranch.city}, {selectedBranch.state}
+                  </p>
+                </div>
+                <button
+                  onClick={() => setSelectedBranch(null)}
+                  className="text-gray-500 hover:text-gray-700"
+                >
+                  <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+
+              {modalLoading ? (
+                <div className="flex justify-center items-center h-32">
+                  <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-indigo-500"></div>
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  {/* Summary Cards */}
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
+                      <h4 className="text-sm font-medium text-blue-800 mb-1">Total Revenue</h4>
+                      <p className="text-2xl font-bold text-blue-900">{formatCurrency(branchDetails.revenue)}</p>
+                    </div>
+                    <div className="bg-green-50 p-4 rounded-lg border border-green-100">
+                      <h4 className="text-sm font-medium text-green-800 mb-1">Customers</h4>
+                      <p className="text-2xl font-bold text-green-900">{branchDetails.customers.length}</p>
+                    </div>
+                    <div className="bg-purple-50 p-4 rounded-lg border border-purple-100">
+                      <h4 className="text-sm font-medium text-purple-800 mb-1">Employees</h4>
+                      <p className="text-2xl font-bold text-purple-900">{branchDetails.employees.length}</p>
+                    </div>
+                    <div className="bg-orange-50 p-4 rounded-lg border border-orange-100">
+                      <h4 className="text-sm font-medium text-orange-800 mb-1">Orders</h4>
+                      <p className="text-2xl font-bold text-orange-900">{branchDetails.orders.length}</p>
+                    </div>
+                  </div>
+
+                  {/* Details Sections */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Customers Section */}
+                    <div className="bg-white border border-gray-200 rounded-lg p-4">
+                      <h4 className="font-medium text-lg mb-3 text-gray-800">Recent Customers</h4>
+                      <div className="space-y-3">
+                        {branchDetails.customers.slice(0, 5).map(customer => (
+                          <div key={customer._id} className="flex items-center space-x-3">
+                            <div className="flex-shrink-0 h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center">
+                              <span className="text-indigo-800 font-medium">
+                                {customer.first_name?.[0]}{customer.last_name?.[0]}
+                              </span>
+                            </div>
+                            <div>
+                              <p className="font-medium text-gray-900">{customer.first_name} {customer.last_name}</p>
+                              <p className="text-sm text-gray-500">{customer.email}</p>
+                            </div>
+                          </div>
+                        ))}
+                        {branchDetails.customers.length === 0 && (
+                          <p className="text-gray-500 text-sm">No customers found</p>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Employees Section */}
+                    <div className="bg-white border border-gray-200 rounded-lg p-4">
+                      <h4 className="font-medium text-lg mb-3 text-gray-800">Employees</h4>
+                      <div className="space-y-3">
+                        {branchDetails.employees.slice(0, 5).map(employee => (
+                          <div key={employee._id} className="flex items-center space-x-3">
+                            <div className="flex-shrink-0 h-10 w-10 rounded-full bg-green-100 flex items-center justify-center">
+                              <span className="text-green-800 font-medium">
+                                {employee.first_name?.[0]}{employee.last_name?.[0]}
+                              </span>
+                            </div>
+                            <div>
+                              <p className="font-medium text-gray-900">{employee.first_name} {employee.last_name}</p>
+                              <p className="text-sm text-gray-500 capitalize">{employee.role}</p>
+                            </div>
+                          </div>
+                        ))}
+                        {branchDetails.employees.length === 0 && (
+                          <p className="text-gray-500 text-sm">No employees found</p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Status Toggle */}
+                  <div className="pt-4 border-t border-gray-200">
+                    <button
+                      onClick={() => handleStatusToggle(selectedBranch._id, selectedBranch.status)}
+                      className={`px-4 py-2 rounded-lg font-medium ${
+                        selectedBranch.status === 'active'
+                          ? 'bg-red-600 text-white hover:bg-red-700'
+                          : 'bg-green-600 text-white hover:bg-green-700'
+                      }`}
+                    >
+                      {selectedBranch.status === 'active' ? 'Deactivate Branch' : 'Activate Branch'}
+                    </button>
+                    <p className="mt-2 text-sm text-gray-500">
+                      {selectedBranch.status === 'active'
+                        ? 'Deactivating will prevent new orders from being placed at this location'
+                        : 'Activating will allow orders to be placed at this location'}
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
