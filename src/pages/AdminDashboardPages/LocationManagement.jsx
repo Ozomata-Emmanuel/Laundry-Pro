@@ -42,21 +42,27 @@ const LocationManagement = () => {
             "Content-Type": "application/json",
           },
         };
-      const [revenueRes, customersRes, employeesRes, ordersRes] = await Promise.all([
-        axios.get(`http://localhost:5002/laundry/api/orders/branch/revenue/${branchId}`),
+      const [customersRes, employeesRes, ordersRes] = await Promise.all([
         axios.get(`http://localhost:5002/laundry/api/users/branch/${branchId}/customers`, config),
         axios.get(`http://localhost:5002/laundry/api/users/branch/${branchId}/employees`, config),
         axios.get(`http://localhost:5002/laundry/api/order/all/${branchId}`, config)
       ]);
 
+      const paidOrders = ordersRes.data.data.filter((o) => o.is_paid);
+      
       setBranchDetails({
-        revenue: revenueRes.data.data || 0,
+        revenue: paidOrders.reduce(
+            (sum, order) => sum + (order.total_price || 0),
+            0
+          ),
         customers: customersRes.data.data || [],
         employees: employeesRes.data.data || [],
         orders: ordersRes.data.data || []
       });
+
     } catch (error) {
       toast.error('Failed to fetch branch details');
+      console.log(error)
     } finally {
       setModalLoading(false);
     }
@@ -68,9 +74,17 @@ const LocationManagement = () => {
   };
 
   const handleStatusToggle = async (branchId, currentStatus) => {
+      const AdminToken = localStorage.getItem("AdminToken");
+
+      const config = {
+          headers: {
+            Authorization: `Bearer ${AdminToken}`,
+            "Content-Type": "application/json",
+          },
+        };
     const newStatus = currentStatus === 'active' ? 'inactive' : 'active';
     try {
-      await axios.patch(`http://localhost:5002/laundry/api/branch/${branchId}/status`, { status: newStatus });
+      await axios.patch(`http://localhost:5002/laundry/api/branch/${branchId}/status`, { status: newStatus }, config);
       toast.success(`Branch ${newStatus === 'active' ? 'activated' : 'deactivated'}`);
       fetchBranches();
       if (selectedBranch && selectedBranch._id === branchId) {
@@ -152,7 +166,6 @@ const LocationManagement = () => {
                       <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Location</th>
                       <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Phone</th>
                       <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Status</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Actions</th>
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
@@ -179,30 +192,6 @@ const LocationManagement = () => {
                             {branch.status.toUpperCase()}
                           </span>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                          <div className="flex space-x-2">
-                            <Link
-                              to={`/edit-branch/${branch._id}`}
-                              className="text-indigo-600 hover:text-indigo-900"
-                              onClick={(e) => e.stopPropagation()}
-                            >
-                              Edit
-                            </Link>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleStatusToggle(branch._id, branch.status);
-                              }}
-                              className={`${
-                                branch.status === 'active'
-                                  ? 'text-red-600 hover:text-red-900'
-                                  : 'text-green-600 hover:text-green-900'
-                              }`}
-                            >
-                              {branch.status === 'active' ? 'Deactivate' : 'Activate'}
-                            </button>
-                          </div>
-                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -213,18 +202,13 @@ const LocationManagement = () => {
         </div>
       </div>
 
-      {/* Branch Details Modal */}
       {selectedBranch && (
         <div className="fixed inset-0 bg-black/10 backdrop-blur-xs flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-xl shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
-            <div className="p-6">
-              <div className="flex justify-between items-start mb-6">
-                <div>
-                  <h3 className="text-2xl font-bold text-indigo-900">{selectedBranch.branch_name}</h3>
-                  <p className="text-gray-600">
-                    {selectedBranch.address}, {selectedBranch.city}, {selectedBranch.state}
-                  </p>
-                </div>
+            <div className="bg-white flex items-center justify-between p-3 border-b-1 border-gray-300 sticky top-0 z-50">
+              <h1 className='text-3xl font-semibold'>
+                Branch details
+              </h1>
                 <button
                   onClick={() => setSelectedBranch(null)}
                   className="text-gray-500 hover:text-gray-700"
@@ -233,6 +217,15 @@ const LocationManagement = () => {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                   </svg>
                 </button>
+            </div>
+            <div className="p-6">
+              <div className="flex justify-between items-start mb-6">
+                <div>
+                  <h3 className="text-2xl font-bold text-indigo-900">{selectedBranch.branch_name}</h3>
+                  <p className="text-gray-600">
+                    {selectedBranch.address}, {selectedBranch.city}, {selectedBranch.state}
+                  </p>
+                </div>
               </div>
 
               {modalLoading ? (
@@ -241,7 +234,6 @@ const LocationManagement = () => {
                 </div>
               ) : (
                 <div className="space-y-6">
-                  {/* Summary Cards */}
                   <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                     <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
                       <h4 className="text-sm font-medium text-blue-800 mb-1">Total Revenue</h4>
@@ -261,9 +253,7 @@ const LocationManagement = () => {
                     </div>
                   </div>
 
-                  {/* Details Sections */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {/* Customers Section */}
                     <div className="bg-white border border-gray-200 rounded-lg p-4">
                       <h4 className="font-medium text-lg mb-3 text-gray-800">Recent Customers</h4>
                       <div className="space-y-3">
@@ -286,7 +276,6 @@ const LocationManagement = () => {
                       </div>
                     </div>
 
-                    {/* Employees Section */}
                     <div className="bg-white border border-gray-200 rounded-lg p-4">
                       <h4 className="font-medium text-lg mb-3 text-gray-800">Employees</h4>
                       <div className="space-y-3">
@@ -310,7 +299,6 @@ const LocationManagement = () => {
                     </div>
                   </div>
 
-                  {/* Status Toggle */}
                   <div className="pt-4 border-t border-gray-200">
                     <button
                       onClick={() => handleStatusToggle(selectedBranch._id, selectedBranch.status)}

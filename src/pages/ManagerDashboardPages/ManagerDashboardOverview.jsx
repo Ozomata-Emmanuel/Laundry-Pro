@@ -1,18 +1,30 @@
-import React, { useState, useEffect, useContext } from 'react';
-import axios from 'axios';
-import { DataContext } from '../../context/DataContext';
-import { 
-  FaShoppingBag, 
-  FaUserTie, 
-  FaMoneyBillWave, 
+import React, { useState, useEffect, useContext } from "react";
+import axios from "axios";
+import { DataContext } from "../../context/DataContext";
+import {
+  FaShoppingBag,
+  FaUserTie,
+  FaMoneyBillWave,
   FaClock,
   FaSpinner,
   FaCheckCircle,
   FaExclamationTriangle,
   FaCalendarAlt,
-  FaTshirt
-} from 'react-icons/fa';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+  FaTshirt,
+} from "react-icons/fa";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+} from "recharts";
 
 const ManagerDashboardOverview = () => {
   const { users } = useContext(DataContext);
@@ -26,13 +38,13 @@ const ManagerDashboardOverview = () => {
     avgCompletionTime: 0,
     popularServices: [],
     statusData: [],
-    paymentData: []
+    paymentData: [],
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const managerUser = users.manager;
 
-  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
+  const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#8884d8"];
 
   useEffect(() => {
     if (managerUser?.branch) {
@@ -40,97 +52,123 @@ const ManagerDashboardOverview = () => {
     }
   }, [managerUser]);
 
-const fetchStats = async (branchId) => {
-  const ManagerToken = localStorage.getItem("ManagerToken");
-  
-  if (!ManagerToken) {
-    setError('No authentication token found');
-    setLoading(false);
-    return;
-  }
+  const fetchStats = async (branchId) => {
+    const ManagerToken = localStorage.getItem("ManagerToken");
 
-  try {
-    setLoading(true);
-    
-    const config = {
-      headers: {
-        'Authorization': `Bearer ${ManagerToken}`,
-        'Content-Type': 'application/json'
-      }
-    };
+    if (!ManagerToken) {
+      setError("No authentication token found");
+      setLoading(false);
+      return;
+    }
 
-    const [ordersRes, employeesRes] = await Promise.all([
-      axios.get(`http://localhost:5002/laundry/api/order/all/${branchId}`, config),
-      axios.get(`http://localhost:5002/laundry/api/users/branch/${branchId}/employees`, config)
-    ]);
+    try {
+      setLoading(true);
 
-    const orders = ordersRes.data.data || [];
-    const employees = employeesRes.data.data || [];
+      const config = {
+        headers: {
+          Authorization: `Bearer ${ManagerToken}`,
+          "Content-Type": "application/json",
+        },
+      };
 
-    const paidOrders = orders.filter(o => o.is_paid);
-    const unpaidOrders = orders.filter(o => !o.is_paid);
-    
-    const overdueOrders = orders.filter(o => 
-      o.pickup_date && new Date(o.pickup_date) < new Date() && o.status !== 'finished'
-    ).length;
+      const [ordersRes, employeesRes] = await Promise.all([
+        axios.get(
+          `http://localhost:5002/laundry/api/order/all/${branchId}`,
+          config
+        ),
+        axios.get(
+          `http://localhost:5002/laundry/api/users/branch/${branchId}/employees`,
+          config
+        ),
+      ]);
 
-    const completedOrders = orders.filter(o => o.status === 'finished');
-    const totalCompletionTime = completedOrders.reduce((sum, order) => {
-      if (order.updatedAt && order.createdAt) {
-        return sum + (new Date(order.updatedAt) - new Date(order.createdAt));
-      }
-      return sum;
-    }, 0);
-    const avgCompletionTime = completedOrders.length > 0 
-      ? totalCompletionTime / completedOrders.length 
-      : 0;
+      const orders = ordersRes.data.data || [];
+      const employees = employeesRes.data.data || [];
 
-    const itemCounts = {};
-    orders.forEach(order => {
-      if (order.items && Array.isArray(order.items)) {
-        order.items.forEach(item => {
-          if (item && item.name) {
-            itemCounts[item.name] = (itemCounts[item.name] || 0) + (item.quantity || 1);
-          }
-        });
-      }
-    });
-    const popularItems = Object.entries(itemCounts)
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 5)
-      .map(([name, count]) => ({ name, count }));
+      const paidOrders = orders.filter((o) => o.is_paid);
+      const unpaidOrders = orders.filter((o) => !o.is_paid);
 
-    setStats({
-      totalOrders: orders.length,
-      pendingOrders: orders.filter(o => o.status === 'not_started').length,
-      completedOrders: completedOrders.length,
-      totalEmployees: employees.length,
-      revenue: paidOrders.reduce((sum, order) => sum + (order.total_price || 0), 0),
-      overdueOrders,
-      avgCompletionTime: avgCompletionTime / (1000 * 60 * 60),
-      popularItems, 
-      statusData: [
-        { name: 'Not Started', value: orders.filter(o => o.status === 'not_started').length },
-        { name: 'Processing', value: orders.filter(o => o.status === 'processing').length },
-        { name: 'Finished', value: completedOrders.length },
-      ],
-      paymentData: [
-        { name: 'Paid', value: paidOrders.length },
-        { name: 'Unpaid', value: unpaidOrders.length }
-      ],
-      deliveryStats: [ 
-        { name: 'Pickup', value: orders.filter(o => o.delivery_option === 'pickup').length },
-        { name: 'Dropoff', value: orders.filter(o => o.delivery_option === 'dropoff').length }
-      ]
-    });
-    
-    setLoading(false);
-  } catch (err) {
-    console.error("API Error:", err.response?.data || err.message);
-    setError(err.response?.data?.message || 'Failed to fetch dashboard data');
-    setLoading(false);
-  }
-};
+      const overdueOrders = orders.filter(
+        (o) =>
+          o.pickup_date &&
+          new Date(o.pickup_date) < new Date() &&
+          o.status !== "finished"
+      ).length;
+
+      const completedOrders = orders.filter((o) => o.status === "finished");
+      const totalCompletionTime = completedOrders.reduce((sum, order) => {
+        if (order.updatedAt && order.createdAt) {
+          return sum + (new Date(order.updatedAt) - new Date(order.createdAt));
+        }
+        return sum;
+      }, 0);
+      const avgCompletionTime =
+        completedOrders.length > 0
+          ? totalCompletionTime / completedOrders.length
+          : 0;
+
+      const itemCounts = {};
+      orders.forEach((order) => {
+        if (order.items && Array.isArray(order.items)) {
+          order.items.forEach((item) => {
+            if (item && item.name) {
+              itemCounts[item.name] =
+                (itemCounts[item.name] || 0) + (item.quantity || 1);
+            }
+          });
+        }
+      });
+      const popularItems = Object.entries(itemCounts)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 5)
+        .map(([name, count]) => ({ name, count }));
+
+      setStats({
+        totalOrders: orders.length,
+        pendingOrders: orders.filter((o) => o.status === "not_started").length,
+        completedOrders: completedOrders.length,
+        totalEmployees: employees.length,
+        revenue: paidOrders.reduce(
+          (sum, order) => sum + (order.total_price || 0),
+          0
+        ),
+        overdueOrders,
+        avgCompletionTime: avgCompletionTime / (1000 * 60 * 60),
+        popularItems,
+        statusData: [
+          {
+            name: "Not Started",
+            value: orders.filter((o) => o.status === "not_started").length,
+          },
+          {
+            name: "Processing",
+            value: orders.filter((o) => o.status === "processing").length,
+          },
+          { name: "Finished", value: completedOrders.length },
+        ],
+        paymentData: [
+          { name: "Paid", value: paidOrders.length },
+          { name: "Unpaid", value: unpaidOrders.length },
+        ],
+        deliveryStats: [
+          {
+            name: "Pickup",
+            value: orders.filter((o) => o.delivery_option === "pickup").length,
+          },
+          {
+            name: "Dropoff",
+            value: orders.filter((o) => o.delivery_option === "dropoff").length,
+          },
+        ],
+      });
+
+      setLoading(false);
+    } catch (err) {
+      console.error("API Error:", err.response?.data || err.message);
+      setError(err.response?.data?.message || "Failed to fetch dashboard data");
+      setLoading(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -150,8 +188,10 @@ const fetchStats = async (branchId) => {
 
   return (
     <div className="container mx-auto px-4 py-6">
-      <h1 className="text-2xl font-bold text-gray-800 mb-6">Dashboard Overview</h1>
-      
+      <h1 className="text-2xl font-bold text-gray-800 mb-6">
+        Dashboard Overview
+      </h1>
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <div className="bg-white p-6 rounded-lg shadow hover:shadow-md transition-shadow">
           <div className="flex items-center">
@@ -174,7 +214,10 @@ const fetchStats = async (branchId) => {
             <div>
               <p className="text-sm text-gray-500">Pending Orders</p>
               <p className="text-2xl font-bold">{stats.pendingOrders}</p>
-              <p className="text-xs text-gray-400 mt-1">{Math.round((stats.pendingOrders / stats.totalOrders) * 100)}% of total</p>
+              <p className="text-xs text-gray-400 mt-1">
+                {Math.round((stats.pendingOrders / stats.totalOrders) * 100)}%
+                of total
+              </p>
             </div>
           </div>
         </div>
@@ -200,12 +243,15 @@ const fetchStats = async (branchId) => {
             <div>
               <p className="text-sm text-gray-500">Total Revenue</p>
               <p className="text-2xl font-bold">
-                ₦{stats.revenue.toLocaleString('en-US', {
+                ₦
+                {stats.revenue.toLocaleString("en-US", {
                   minimumFractionDigits: 2,
                   maximumFractionDigits: 2,
                 })}
               </p>
-              <p className="text-xs text-gray-400 mt-1">From {stats.completedOrders} completed orders</p>
+              <p className="text-xs text-gray-400 mt-1">
+                From {stats.completedOrders} completed orders
+              </p>
             </div>
           </div>
         </div>
@@ -220,7 +266,10 @@ const fetchStats = async (branchId) => {
             <div>
               <p className="text-sm text-gray-500">Completed Orders</p>
               <p className="text-2xl font-bold">{stats.completedOrders}</p>
-              <p className="text-xs text-gray-400 mt-1">{Math.round((stats.completedOrders / stats.totalOrders) * 100)}% completion rate</p>
+              <p className="text-xs text-gray-400 mt-1">
+                {Math.round((stats.completedOrders / stats.totalOrders) * 100)}%
+                completion rate
+              </p>
             </div>
           </div>
         </div>
@@ -245,32 +294,33 @@ const fetchStats = async (branchId) => {
             </div>
             <div>
               <p className="text-sm text-gray-500">Avg. Completion</p>
-              <p className="text-2xl font-bold">{stats.avgCompletionTime.toFixed(1)} hrs</p>
+              <p className="text-2xl font-bold">
+                {stats.avgCompletionTime.toFixed(1)} hrs
+              </p>
               <p className="text-xs text-gray-400 mt-1">Processing time</p>
             </div>
           </div>
         </div>
 
-<div className="bg-white p-6 rounded-lg shadow hover:shadow-md transition-shadow">
-  <h3 className="text-sm text-gray-500 mb-2">Top Items</h3>
-  <div className="space-y-2">
-    {stats.popularItems?.length > 0 ? (
-      stats.popularItems.slice(0, 3).map((item, index) => (
-        <div key={index} className="flex justify-between">
-          <span className="font-medium truncate">
-            {index + 1}. {item.name}
-          </span>
-          <span className="text-gray-500">{item.count} orders</span>
+        <div className="bg-white p-6 rounded-lg shadow hover:shadow-md transition-shadow">
+          <h3 className="text-sm text-gray-500 mb-2">Top Items</h3>
+          <div className="space-y-2">
+            {stats.popularItems?.length > 0 ? (
+              stats.popularItems.slice(0, 3).map((item, index) => (
+                <div key={index} className="flex justify-between">
+                  <span className="font-medium truncate">
+                    {index + 1}. {item.name}
+                  </span>
+                  <span className="text-gray-500">{item.count} orders</span>
+                </div>
+              ))
+            ) : (
+              <p className="text-gray-400">No item data available</p>
+            )}
+          </div>
         </div>
-      ))
-    ) : (
-      <p className="text-gray-400">No item data available</p>
-    )}
-  </div>
-</div>
       </div>
 
-      
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
         <div className="bg-white p-6 rounded-lg shadow">
           <h2 className="text-lg font-semibold mb-4">Orders by Status</h2>
@@ -302,10 +352,15 @@ const fetchStats = async (branchId) => {
                   fill="#8884d8"
                   dataKey="value"
                   nameKey="name"
-                  label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                  label={({ name, percent }) =>
+                    `${name}: ${(percent * 100).toFixed(0)}%`
+                  }
                 >
                   {stats.paymentData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={COLORS[index % COLORS.length]}
+                    />
                   ))}
                 </Pie>
                 <Tooltip />
@@ -314,29 +369,33 @@ const fetchStats = async (branchId) => {
             </ResponsiveContainer>
           </div>
         </div>
-        
       </div>
 
-<div className="bg-white p-6 rounded-lg shadow mb-8">
-  <h2 className="text-lg font-semibold mb-4">Top Items</h2>
-  {stats.popularItems?.length > 0 ? (
-    <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-      {stats.popularItems.map((item, index) => (
-        <div key={index} className="bg-gray-50 p-4 rounded-lg text-center">
-          <div className="mx-auto w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center mb-2">
-            <FaTshirt className="text-blue-600" />
+      <div className="bg-white p-6 rounded-lg shadow mb-8">
+        <h2 className="text-lg font-semibold mb-4">Top Items</h2>
+        {stats.popularItems?.length > 0 ? (
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+            {stats.popularItems.map((item, index) => (
+              <div
+                key={index}
+                className="bg-gray-50 p-4 rounded-lg text-center"
+              >
+                <div className="mx-auto w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center mb-2">
+                  <FaTshirt className="text-blue-600" />
+                </div>
+                <h3 className="font-medium text-gray-800 truncate">
+                  {item.name}
+                </h3>
+                <p className="text-sm text-gray-500">{item.count} orders</p>
+              </div>
+            ))}
           </div>
-          <h3 className="font-medium text-gray-800 truncate">{item.name}</h3>
-          <p className="text-sm text-gray-500">{item.count} orders</p>
-        </div>
-      ))}
-    </div>
-  ) : (
-    <div className="text-center py-8 text-gray-500">
-      No item data available
-    </div>
-  )}
-</div>
+        ) : (
+          <div className="text-center py-8 text-gray-500">
+            No item data available
+          </div>
+        )}
+      </div>
     </div>
   );
 };
